@@ -14,7 +14,7 @@
 			"style": {
 				"navigationBarBackgroundColor": "#fff",
 				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "技术交流群",
+				"navigationBarTitleText": "",
 				"app-plus": {
 					"bounce": "vertical",
 					"scrollIndicator": "none"
@@ -24,7 +24,7 @@
 		{
 			"path": "pages/friendList/friendList",
 			"style": {
-				"navigationBarTitleText": "消息 ",
+				"navigationBarTitleText": "访客",
 				"enablePullDownRefresh": true,
 				"app-plus": {
 					"bounce": "vertical"
@@ -34,7 +34,7 @@
 		{
 			"path": "pages/tabbar/my/my",
 			"style": {
-				"navigationBarTitleText": "技术交流群",
+				"navigationBarTitleText": "",
 				"app-plus": {
 					"bounce": "vertical",
 					"scrollIndicator": "none"
