@@ -1,0 +1,96 @@
+{
+	"pages": [{
+			"path": "pages/msgList/msgList",
+			"style": {
+				"navigationBarTitleText": "消息 ",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		},
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "技术交流群",
+				"app-plus": {
+					"bounce": "vertical",
+					"scrollIndicator": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/friendList/friendList",
+			"style": {
+				"navigationBarTitleText": "消息 ",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		},
+		{
+			"path": "pages/tabbar/my/my",
+			"style": {
+				"navigationBarTitleText": "技术交流群",
+				"app-plus": {
+					"bounce": "vertical",
+					"scrollIndicator": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/common/login/login",
+			"style": {
+				"backgroundColorTop": "#5677FC",
+				"backgroundColorBottom": "#ffffff",
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		}
+
+	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"tui-(.*)": "@/components/thorui/tui-$1/tui-$1.vue"
+		}
+	},
+	"globalStyle": {
+		"backgroundTextStyle": "dark",
+		"navigationBarBackgroundColor": "#5677FC",
+		"navigationBarTitleText": "Thor UI",
+		"navigationBarTextStyle": "white",
+		"backgroundColor": "#fafafa",
+		"backgroundColorTop": "#fafafa",
+		"backgroundColorBottom": "#fafafa"
+	},
+	"tabBar": {
+		"color": "#666666",
+		"selectedColor": "#5677FC",
+		"backgroundColor": "#FFFFFF",
+		"list": [{
+				"pagePath": "pages/msgList/msgList",
+				"text": "消息",
+				"iconPath": "static/images/tabbar/message.png",
+				"selectedIconPath": "static/images/tabbar/message_active.png"
+			},
+			{
+				"pagePath": "pages/friendList/friendList",
+				"text": "访客",
+				"iconPath": "static/images/tabbar/users.png",
+				"selectedIconPath": "static/images/tabbar/users_active.png"
+			},
+			{
+				"pagePath": "pages/tabbar/my/my",
+				"text": "我",
+				"iconPath": "static/images/tabbar/my.png",
+				"selectedIconPath": "static/images/tabbar/my_active.png"
+			}
+		]
+	}
+}

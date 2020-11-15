@@ -1,0 +1,1 @@
+<view data-event-opts="{{[['tap',[['handleClick',['$event']]]]]}}" class="{{['data-v-b0f020f8',dot?'tui-badge-dot':'tui-badge','tui-'+type,!dot?'tui-badge-scale':'']}}" style="{{'top:'+(top)+';'+('right:'+(right)+';')+('position:'+(absolute?'absolute':'static')+';')+('transform:'+(getStyle)+';')+('margin:'+(margin)+';')}}" bindtap="__e"><slot></slot></view>

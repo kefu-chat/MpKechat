@@ -1,0 +1,10 @@
+{
+  "navigationBarBackgroundColor": "#fff",
+  "navigationBarTextStyle": "black",
+  "navigationBarTitleText": "技术交流群",
+  "usingComponents": {
+    "tui-loadmore": "/components/thorui/tui-loadmore/tui-loadmore",
+    "tui-badge": "/components/thorui/tui-badge/tui-badge",
+    "t-chat-bar": "/components/views/t-chat-bar/t-chat-bar"
+  }
+}
