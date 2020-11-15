@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "消息 ",
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "tui-list-cell": "/components/thorui/tui-list-cell/tui-list-cell",
-    "tui-badge": "/components/thorui/tui-badge/tui-badge"
-  }
-}
