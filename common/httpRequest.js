@@ -6,7 +6,7 @@
 const tui = {
 	//接口地址
 	interfaceUrl: function() {
-		return 'https://www.thorui.cn'
+		return 'http://dev.fastsupport.cn/'
 		//return 'https://test.thorui.cn'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
@@ -178,6 +178,9 @@ const tui = {
 	setUserInfo: function(mobile, token) {
 		//uni.setStorageSync("thorui_token", token)
 		uni.setStorageSync("thorui_mobile", mobile)
+	},
+	setToken(token){
+		uni.setStorageSync("thorui_token")
 	},
 	//获取token
 	getToken() {
