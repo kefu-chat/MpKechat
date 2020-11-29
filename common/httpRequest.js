@@ -5,9 +5,10 @@
 
 const tui = {
 	//接口地址
+	is_online:false,
 	interfaceUrl: function() {
-		return 'http://dev.fastsupport.cn/'
-		//return 'https://test.thorui.cn'
+		// return 'http://dev.fastsupport.cn/'
+		return 'https://api.kefu.chat/'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
 	},
@@ -57,6 +58,11 @@ const tui = {
 		return time
 	},
 	delayed: null,
+	login:async function(){
+		return new Promise((resolve,reject)=>{
+			
+		})
+	},
 	/**
 	 * 请求数据处理
 	 * @param string url 请求地址
@@ -71,7 +77,7 @@ const tui = {
 	 *  true: 隐藏
 	 *  false:显示
 	 */
-	request: function(url, method, postData, isDelay, isForm, hideLoading) {
+	request: async function(url, method, postData, isDelay, isForm, hideLoading,callback) {
 		//接口请求
 		let loadding = false;
 		tui.delayed && uni.hideLoading();
@@ -88,14 +94,13 @@ const tui = {
 				})
 			}, isDelay ? 1000 : 0)
 		}
-
-		return new Promise((resolve, reject) => {
+		return new Promise(async (resolve, reject) => {
 			uni.request({
 				url: tui.interfaceUrl() + url,
 				data: postData,
 				header: {
 					'content-type': isForm ? 'application/x-www-form-urlencoded' : 'application/json',
-					'Authorization': tui.getToken()
+					'Authorization': 'Bearer ' + tui.getToken()
 				},
 				method: method, //'GET','POST'
 				dataType: 'json',
@@ -180,7 +185,7 @@ const tui = {
 		uni.setStorageSync("thorui_mobile", mobile)
 	},
 	setToken(token){
-		uni.setStorageSync("thorui_token")
+		uni.setStorageSync("thorui_token",token)
 	},
 	//获取token
 	getToken() {

@@ -1,16 +1,5 @@
 <template>
 	<view class="container">
-		<!--tabbar-->
-	<!-- 	<view class="tui-tabbar">
-			<block v-for="(item,index) in tabbar" :key="index">
-				<view class="tui-tabbar-item" :class="[current==index?'tui-item-active':'']" :data-index="index" @tap="tabbarSwitch">
-					<tui-icon :name="current==index?(item.icon+'-fill'):item.icon" :color="current==index?'#00C0FB':'#666'" :size="item.size"
-					 :class="[index==0?'tui-ptop-4':'']"></tui-icon>
-					<view class="tui-scale">{{item.text}}</view>
-				</view>
-			</block>
-		</view> -->
-		<!--tabbar-->
 		<!--searchbox-->
 		<view class="tui-searchbox">
 			<view class="tui-search-input" @tap="search">
@@ -20,19 +9,19 @@
 		</view>
 		<!--searchbox-->
 
-		<block v-for="(item,index) in msgList" :key="index">
-			<tui-list-cell @click="detail" :unlined="true">
+		<block v-for="(item,index) in msgList" :key="item.id">
+			<tui-list-cell @click="detail(item.id)" :unlined="true">
 				<view class="tui-chat-item">
 					<view class="tui-msg-box">
-						<image :src="'/static/images/news/'+item.pic+'.jpg'" class="tui-msg-pic" mode="widthFix"></image>
+						<image :src="item.visitor.avatar?item.visitor.avatar:'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'" class="tui-msg-pic" mode="widthFix"></image>
 						<view class="tui-msg-item">
-							<view class="tui-msg-name">{{item.nickname}}</view>
-							<view class="tui-msg-content">{{item.msg}}</view>
+							<view class="tui-msg-name">{{item.visitor.name}}</view>
+							<view class="tui-msg-content">{{item.last_message.type==2?'[图片]':item.last_message.content}}</view>
 						</view>
 					</view>
-					<view class="tui-msg-right" :class="[item.level==3?'tui-right-dot':'']">
-						<view class="tui-msg-time">{{item.time}}</view>
-						<tui-badge :type="item.level==2?'gray':'danger'" :dot="item.level==3?true:false" v-if="item.msgNum>0">{{item.level!=3?item.msgNum:""}}</tui-badge>
+					<view class="tui-msg-right tui-right-dot">
+						<uni-dateformat :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
+						<tui-badge type="danger" dot="true" v-if="item.hasNotRead"></tui-badge>
 					</view>
 				</view>
 			</tui-list-cell>
@@ -42,144 +31,44 @@
 </template>
 
 <script>
+	import tui from '@/common/httpRequest.js'
 	export default {
 		data() {
 			return {
 				current: 0,
-				tabbar: [{
-					icon: "community",
-					text: "消息",
-					size: 24
-				}, {
-					icon: "people",
-					text: "联系人",
-					size: 24
-				}, {
-					icon: "explore",
-					text: "发现",
-					size: 24
-				}],
-				msgList: [{
-					nickname: "波动星球",
-					pic: "avatar_1",
-					msg: "兰家双臂初长成！",
-					msgNum: 2,
-					time: "10:22",
-					level: 1
-				}, {
-					nickname: "Thorui看点",
-					pic: "avatar_2",
-					msg: "thorui商城模板即将上线，功能完善中！",
-					msgNum: 2,
-					time: "13:27",
-					level: 3
-				}, {
-					nickname: "技术交流群",
-					pic: "4",
-					msg: "[图片]",
-					msgNum: 18,
-					time: "12:27",
-					level: 1
-				}, {
-					nickname: "技术交流2群",
-					pic: "2",
-					msg: "[视频]",
-					msgNum: 98,
-					time: "10:27",
-					level: 2
-				}, {
-					nickname: "陈永华",
-					pic: "avatar_1",
-					msg: "对方已同意你的好友请求",
-					msgNum: 2,
-					time: "10:27",
-					level: 1
-				}, {
-					nickname: "尚高旭",
-					pic: "avatar_2",
-					msg: "晚上一起吃个饭！",
-					msgNum: 0,
-					time: "10:27",
-					level: 1
-				}, {
-					nickname: "张新旺",
-					pic: "avatar_1",
-					msg: "[图片]",
-					msgNum: 0,
-					time: "10:27",
-					level: 1
-				}, {
-					nickname: "曾少敏",
-					pic: "3",
-					msg: "对方已同意你的好友请求对方已同意你的好友请求",
-					msgNum: 0,
-					time: "10:27",
-					level: 1
-				}, {
-					nickname: "波动星球",
-					pic: "avatar_1",
-					msg: "兰家双臂初长成！",
-					msgNum: 2,
-					time: "10:22",
-					level: 1
-				}, {
-					nickname: "Thorui看点",
-					pic: "avatar_2",
-					msg: "thorui商城模板即将上线，功能完善中！",
-					msgNum: 2,
-					time: "13:27",
-					level: 3
-				}, {
-					nickname: "技术交流群",
-					pic: "4",
-					msg: "[图片]",
-					msgNum: 18,
-					time: "12:27",
-					level: 1
-				}, {
-					nickname: "技术交流2群",
-					pic: "2",
-					msg: "[视频]",
-					msgNum: 98,
-					time: "10:27",
-					level: 2
-				}, {
-					nickname: "陈永华",
-					pic: "avatar_1",
-					msg: "对方已同意你的好友请求",
-					msgNum: 2,
-					time: "10:27",
-					level: 1
-				}]
+				msgList: [],
+				token:null
 			}
 		},
-		methods: {
-			tabbarSwitch: function(e) {
-				let index = e.currentTarget.dataset.index;
-				this.current = index;
-				if (index != 0) {
-					if (index == 1) {
-						uni.navigateTo({
-							url: '../friendList/friendList'
-						})
-					} else {
-						this.tui.toast("功能开发中~")
-					}
+		mounted() {
+			const timeout = setInterval(()=>{
+				if(tui.getToken()){
+					console.log(tui.getToken())
 				}
+			},500)
+			this.getData();
+		},
+		methods: {
+			getData:function(){
+				tui.request('api/conversation/list?type=active','get').then(res=>{
+					if(res.success){
+						this.msgList = res.data.conversations;
+					}
+				})
 			},
 			search: function() {
 				uni.navigateTo({
 					url: '../../news/search/search'
 				})
 			},
-			detail: function() {
-				console.log('111')
+			detail: function(id) {
 				uni.navigateTo({
-					url: '../chat/chat'
+					url: '../chat/chat?id='+id,
 				})
 			}
 		},
 		onPullDownRefresh: function() {
+			this.getData();
 			uni.stopPullDownRefresh();
 		}
 	}

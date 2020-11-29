@@ -61,10 +61,10 @@ const utils = {
 			return "";
 		}
 	},
-	rgbToHex: function (r, g, b) {
+	rgbToHex: function(r, g, b) {
 		return "#" + utils.toHex(r) + utils.toHex(g) + utils.toHex(b)
 	},
-	toHex: function (n) {
+	toHex: function(n) {
 		n = parseInt(n, 10);
 		if (isNaN(n)) return "00";
 		n = Math.max(0, Math.min(n, 255));
@@ -78,6 +78,38 @@ const utils = {
 			g: parseInt(result[2], 16),
 			b: parseInt(result[3], 16)
 		} : null;
+	},
+	formatDate(dateString) {
+		const formatNumber = n => {
+			n = n.toString()
+			return n[1] ? n : '0' + n
+		}
+		const date = new Date(dateString)
+		const year = date.getFullYear()
+		const month = date.getMonth() + 1
+		const day = date.getDate()
+		return [year, month, day].map(formatNumber).join('-')
+	},
+	getDates(days, todate) {
+		var dateArry = [];
+		for (var i = 0; i < days; i++) {
+			var dateObj = dateLater(todate, i);
+			dateArry.push(dateObj)
+		}
+		return dateArry;
+	},
+	dateLater(dates, later) {
+	  let dateObj = {};
+	  let show_day = new Array('周日', '周一', '周二', '周三', '周四', '周五', '周六');
+	  let date = new Date(dates);
+	  date.setDate(date.getDate() + later);
+	  let day = date.getDay();
+	  let yearDate = date.getFullYear();
+	  let month = ((date.getMonth() + 1) < 10 ? ("0" + (date.getMonth() + 1)) : date.getMonth() + 1);
+	  let dayFormate = (date.getDate() < 10 ? ("0" + date.getDate()) : date.getDate());
+	  dateObj.time =  yearDate+'-'+ month + '-' + dayFormate;
+	  dateObj.week = show_day[day];
+	  return dateObj;
 	}
 }
 
@@ -88,5 +120,7 @@ module.exports = {
 	rmoney: utils.rmoney,
 	formatDate: utils.formatDate,
 	rgbToHex: utils.rgbToHex,
-	hexToRgb: utils.hexToRgb
+	hexToRgb: utils.hexToRgb,
+	getDates: utils.getDates,
+	dateLater: utils.dateLater
 }

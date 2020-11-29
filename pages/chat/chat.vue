@@ -1,41 +1,33 @@
 <template>
 	<view class="container">
 		<!--tabbar-->
-
+		
 		<!--tabbar-->
 		<view class="tui-chat-content">
 			<tui-loadmore v-if="loadding" :index="3" type="primary" text=" "></tui-loadmore>
-			<view v-show="show">
+			<!-- <view v-show="show">
 				<view class="tui-label">对方已通过您的好友请求</view>
 				<view class="tui-chat-center">星期四 11:02</view>
 				<view class="tui-chat-right">
 					<view class="tui-chatbox tui-chatbox-right">哈喽~，欢迎关注Thor UI！</view>
 					<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
 				</view>
-				<view class="tui-chat-left">
-					<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-					<view class="tui-chatbox tui-chatbox-left">哈喽~，欢迎关注Thor UI！</view>
+			</view> -->
+			<view v-for="(value, key) in chatList" :key=key>
+				<view class="tui-chat-center">
+					<uni-dateformat :date="value[0].created_at" format="yyyy-MM-dd hh:mm"></uni-dateformat>
 				</view>
-				<view class="tui-chat-left">
-					<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-					<view class="tui-img-chatbox"><image src="/static/images/news/avatar_2.jpg" class="tui-chat-img" mode="widthFix"></image></view>
+				<view v-for="(item,index) in value" :key="index">
+					<view :class="item.sender_type_text =='visitor'?'tui-chat-left':'tui-chat-right'">
+						<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-left" v-if="item.sender_type_text =='visitor'"></image>
+						<view class="tui-chatbox" :class="item.sender_type_text =='visitor'?'tui-chatbox-left':'tui-chatbox-right'">{{item.content}}</view>
+						<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-left" v-if="item.sender_type_text !='visitor'"></image>
+					</view>
 				</view>
-				<view class="tui-chat-right">
-					<view class="tui-chatbox tui-chatbox-right">哈喽~，欢迎关注Thor UI！</view>
-					<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-				</view>
-				<view class="tui-chat-left">
-					<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-					<view class="tui-chatbox tui-chatbox-left">哈喽~，欢迎关注Thor UI！</view>
-				</view>
-				<view class="tui-chat-left">
-					<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-					<view class="tui-img-chatbox"><image src="/static/images/news/avatar_2.jpg" class="tui-chat-img" mode="widthFix"></image></view>
-				</view>
+				 
 			</view>
 
-
-			<view class="tui-chat-center">星期四 11:02</view>
+			<!-- <view class="tui-chat-center">星期四 11:02</view>
 			<view class="tui-chat-left">
 				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
 				<view class="tui-chatbox tui-chatbox-left">哈喽~，欢迎关注Thor UI！</view>
@@ -99,7 +91,7 @@
 					<image src="/static/images/chat/fail.png" class="tui-chat-fail tui-mr"></image>
 				</view>
 				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-			</view>
+			</view> -->
 		</view>
 		<t-chat-bar></t-chat-bar>
 	</view>
@@ -107,6 +99,9 @@
 
 <script>
 import tChatBar from '@/components/views/t-chat-bar/t-chat-bar';
+import tui from '../../common/httpRequest.js';
+import utils from '../../utils/util.js';
+
 export default {
 	components: {
 		tChatBar
@@ -115,23 +110,46 @@ export default {
 		return {
 			loadding: false,
 			show: false,
-			bottom: 0,
-			myUserId: 2,
-			chatList: [
-				{
-					type: 1, //1-文字 2-图片 3-语音，4-时间 5-提醒 ...
-					userId: 1, //用户标识 不一定是userid
-					text: '',
-					src: '',
-					read: false,
-					success: false
-				}
-			]
+			has_previous:false,
+			chatList: {},
 		};
 	},
-	onLoad: function(options) {},
-	methods: {},
+	onLoad: function(options) {
+		this.getChatDetail(options.id);
+	},
+	methods: {
+		getChatDetail:function(id){
+			this.chatList = {}
+			const chatList = {}
+			tui.request('api/conversation/'+ id +'/messages','get').then(res=>{
+				if(res.success){
+					this.has_previous = res.data.has_previous;
+					for(const i of res.data.messages){
+						if(i.created_at){
+							const day = utils.formatDate(i.created_at);
+							if(!chatList[day]){
+								chatList[day] = [];
+							}
+							chatList[day].push(i)
+						}
+						
+					}
+					this.chatList = chatList;
+					console.log(this.chatList)
+				}
+			})
+		},
+		scrollBottomFn:function(){
+			wx.createSelectorQuery().select('.tui-chat-content').boundingClientRect(function(rect){
+			  wx.pageScrollTo({            
+				scrollTop: rect.bottom,         
+				duration: 0              
+				})
+			  }).exec()
+		}
+	},
 	onPageScroll(e) {
+		if(!this.has_previous){return};
 		if (e.scrollTop == 0 && !this.loadding) {
 			this.loadding = true;
 			setTimeout(() => {

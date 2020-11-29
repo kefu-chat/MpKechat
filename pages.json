@@ -1,5 +1,16 @@
 {
-	"pages": [{
+	"pages": [
+		{
+			"path": "pages/blank/blank",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		},
+		{
 			"path": "pages/msgList/msgList",
 			"style": {
 				"navigationBarTitleText": "消息 ",
@@ -42,7 +53,28 @@
 			}
 		},
 		{
-			"path": "pages/common/login/login",
+			"path": "pages/common/protocol/protocol",
+			"style": {
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"bounce": "vertical",
+					"scrollIndicator": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/common/bind/bind",
+			"style": {
+				"backgroundColorTop": "#5677FC",
+				"backgroundColorBottom": "#ffffff",
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		},
+		{
+			"path": "pages/common/scan/scan",
 			"style": {
 				"backgroundColorTop": "#5677FC",
 				"backgroundColorBottom": "#ffffff",
@@ -52,7 +84,6 @@
 				}
 			}
 		}
-
 	],
 	"easycom": {
 		"autoscan": true,
@@ -68,29 +99,29 @@
 		"backgroundColor": "#fafafa",
 		"backgroundColorTop": "#fafafa",
 		"backgroundColorBottom": "#fafafa"
-	},
-	"tabBar": {
-		"color": "#666666",
-		"selectedColor": "#5677FC",
-		"backgroundColor": "#FFFFFF",
-		"list": [{
-				"pagePath": "pages/msgList/msgList",
-				"text": "消息",
-				"iconPath": "static/images/tabbar/message.png",
-				"selectedIconPath": "static/images/tabbar/message_active.png"
-			},
-			{
-				"pagePath": "pages/friendList/friendList",
-				"text": "访客",
-				"iconPath": "static/images/tabbar/users.png",
-				"selectedIconPath": "static/images/tabbar/users_active.png"
-			},
-			{
-				"pagePath": "pages/tabbar/my/my",
-				"text": "我",
-				"iconPath": "static/images/tabbar/my.png",
-				"selectedIconPath": "static/images/tabbar/my_active.png"
-			}
-		]
 	}
+	// "tabBar": {
+	// 	"color": "#666666",
+	// 	"selectedColor": "#5677FC",
+	// 	"backgroundColor": "#FFFFFF",
+	// 	"list": [{
+	// 			"pagePath": "pages/msgList/msgList",
+	// 			"text": "消息",
+	// 			"iconPath": "static/images/tabbar/message.png",
+	// 			"selectedIconPath": "static/images/tabbar/message_active.png"
+	// 		},
+	// 		{
+	// 			"pagePath": "pages/friendList/friendList",
+	// 			"text": "访客",
+	// 			"iconPath": "static/images/tabbar/users.png",
+	// 			"selectedIconPath": "static/images/tabbar/users_active.png"
+	// 		},
+	// 		{
+	// 			"pagePath": "pages/tabbar/my/my",
+	// 			"text": "我",
+	// 			"iconPath": "static/images/tabbar/my.png",
+	// 			"selectedIconPath": "static/images/tabbar/my_active.png"
+	// 		}
+	// 	]
+	// }
 }
