@@ -3,7 +3,7 @@
 		<view class="tui-bg-box">
 			<image src="/static/images/login/bg_login.png" class="tui-bg-img"></image>
 			<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-photo"></image>
-			<view class="tui-login-name">恰客服</view>
+			<view class="tui-login-name">客服恰</view>
 		</view>
 		<view>
 			<view class="tui-login-from">
