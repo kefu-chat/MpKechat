@@ -42,6 +42,13 @@ export default {
 	onLoad: function (option) {
 		this.loading = true;
 		uni.showNavigationBarLoading();
+		
+		if (option.q && (!option.user || !option.sign)) {
+			let url = new URL(decodeURIComponent(option.q));
+			url.searchParams.forEach((v, k) => {
+				option[k] = v;
+			});
+		}
 		this.option = option;
 		uni.request({
 			url: this.tui.interfaceUrl() + 'api/security/binding/wechat/prepare',

@@ -8,8 +8,8 @@ const tui = {
 	is_online:false,
 	interfaceUrl: function() {
 		//return 'http://dev.fastsupport.cn/'
-		return 'https://kefu.ssl.digital/';
-		//return 'https://api.kefu.chat/'
+		//return 'https://kefu.ssl.digital/';
+		return 'https://api.kefu.chat/'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
 	},
