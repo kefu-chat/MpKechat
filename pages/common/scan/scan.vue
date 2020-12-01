@@ -106,6 +106,11 @@ export default {
 							uni.showModal({
 								content: '绑定成功!',
 								showCancel: false,
+								success: () => {
+									uni.redirectTo({
+										url: '/pages/msgList/msgList',
+									});
+								}
 							});
 						},
 						fail: () => {
