@@ -1,16 +1,6 @@
 {
 	"pages": [
 		{
-			"path": "pages/blank/blank",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": true,
-				"app-plus": {
-					"bounce": "vertical"
-				}
-			}
-		},
-		{
 			"path": "pages/msgList/msgList",
 			"style": {
 				"navigationBarTitleText": "消息 ",
@@ -29,6 +19,16 @@
 				"app-plus": {
 					"bounce": "vertical",
 					"scrollIndicator": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/blank/blank",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"bounce": "vertical"
 				}
 			}
 		},

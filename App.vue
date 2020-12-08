@@ -23,6 +23,7 @@
 								}
 								
 							}else if(res.data.code === 401){
+								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
 								uni.navigateTo({
 									url: '/pages/common/bind/bind'
 								});
