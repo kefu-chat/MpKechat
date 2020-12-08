@@ -23,9 +23,11 @@
 							if(res.data.success){
 								if(res.data.data.token){
 									tui.setToken(res.data.data.token);
-									uni.navigateTo({
-										url: '/pages/msgList/msgList'
-									});
+									if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/msgList/msgList') {
+										uni.navigateTo({
+											url: '/pages/msgList/msgList'
+										});
+									}
 								}
 							}else if(res.data.code === 401){
 								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')

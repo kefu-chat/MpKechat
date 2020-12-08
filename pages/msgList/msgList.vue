@@ -20,7 +20,7 @@
 						</view>
 					</view>
 					<view class="tui-msg-right tui-right-dot">
-						<uni-dateformat :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
+						<uni-dateformat style="width: 50px; display: block;" :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
 						<tui-badge type="danger" dot="true" v-if="item.hasNotRead"></tui-badge>
 					</view>
 				</view>
@@ -62,9 +62,19 @@
 				})
 			},
 			detail: function(id) {
-				uni.navigateTo({
-					url: '../chat/chat?id='+id,
-				})
+				uni.requestSubscribeMessage({
+					tmplIds:[
+						'LHgTmtQNNOiAZ8qNL9g4y-7a_gzNX62chkju-eX44jc',
+						'OmFBieiBSjQGgODZCmE71w1VnptOc_sMYysdaAtURGg',
+					],
+					success: console.log,
+					fail: console.log,
+					complete: () => {
+						uni.navigateTo({
+							url: '../chat/chat?id='+id,
+						})
+					},
+				});
 			}
 		},
 		onPullDownRefresh: function() {
