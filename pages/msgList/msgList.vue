@@ -43,10 +43,10 @@
 		mounted() {
 			const timeout = setInterval(()=>{
 				if(tui.getToken()){
-					console.log(tui.getToken())
+					this.getData();
+					clearInterval(timeout);
 				}
-			},500)
-			this.getData();
+			}, 100)
 		},
 		methods: {
 			getData:function(){
