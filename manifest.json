@@ -99,7 +99,7 @@
         "enable" : false
     },
     "h5" : {
-        "title" : "ThorUI组件库",
+        "title" : "客服恰",
         "sdkConfigs" : {
             "maps" : {
                 "qqmap" : {
@@ -107,7 +107,7 @@
                 }
             }
         },
-        "domain" : "",
+        "domain" : "www.kefu.chat",
         "router" : {
             "mode" : "hash",
             "base" : ""

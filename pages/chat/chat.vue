@@ -124,6 +124,7 @@ export default {
 			const chatList = {}
 			tui.request('api/conversation/'+ id +'/messages','get').then(res=>{
 				if(res.success){
+					uni.setNavigationBarTitle({title: res.data.data.conversation.visitor.name});
 					this.has_previous = res.data.has_previous;
 					for(const i of res.data.messages){
 						if(i.created_at){
@@ -136,7 +137,7 @@ export default {
 						
 					}
 					this.chatList = chatList;
-					console.log(this.chatList)
+					this.scrollBottomFn();
 				}
 			})
 		},

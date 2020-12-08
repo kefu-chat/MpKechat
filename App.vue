@@ -13,8 +13,8 @@
 						data:{ code:res.code },
 						method: 'post',
 						success:(res)=>{
-							tui.is_online = res.data.is_online;
-							if (!res.data.is_online) {
+							tui.is_online = res.data.data.is_online;
+							if (!res.data.data.is_online) {
 								uni.navigateTo({
 									url: '/pages/blank/blank'
 								});
