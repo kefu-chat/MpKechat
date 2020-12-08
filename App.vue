@@ -7,13 +7,19 @@
 			wx.login({
 			  success (res) {
 			    if (res.code) {
-			      //发起网络请求
+					//发起网络请求
 					wx.request({
 						url: tui.interfaceUrl() + 'api/login-via-miniapp',
 						data:{ code:res.code },
 						method: 'post',
 						success:(res)=>{
 							tui.is_online = res.data.is_online;
+							if (!res.data.is_online) {
+								uni.navigateTo({
+									url: '/pages/blank/blank'
+								});
+								return;
+							}
 							if(res.data.success){
 								if(res.data.data.token){
 									tui.setToken(res.data.data.token);
@@ -21,7 +27,6 @@
 										url: '/pages/msgList/msgList'
 									});
 								}
-								
 							}else if(res.data.code === 401){
 								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
 								uni.navigateTo({
