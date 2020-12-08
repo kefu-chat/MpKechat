@@ -20,7 +20,7 @@
 						</view>
 					</view>
 					<view class="tui-msg-right tui-right-dot">
-						<uni-dateformat style="width: 50px; display: block;" :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
+						<uni-dateformat style="width: 90px; display: block; right: 15px; position: absolute;" :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
 						<tui-badge type="danger" dot="true" v-if="item.hasNotRead"></tui-badge>
 					</view>
 				</view>
