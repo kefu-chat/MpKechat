@@ -64,6 +64,7 @@
 			detail: function(id) {
 				uni.requestSubscribeMessage({
 					tmplIds:[
+						'LHgTmtQNNOiAZ8qNL9g4y3RFTOmlMUeaPNkfs5Trte8',
 						'LHgTmtQNNOiAZ8qNL9g4y-7a_gzNX62chkju-eX44jc',
 						'OmFBieiBSjQGgODZCmE71w1VnptOc_sMYysdaAtURGg',
 					],
