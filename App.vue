@@ -4,42 +4,58 @@
 	import tui from 'common/httpRequest.js'
 	export default {
 		onLaunch: function() {
-			wx.login({
-			  success (res) {
-			    if (res.code) {
-					//发起网络请求
-					wx.request({
-						url: tui.interfaceUrl() + 'api/login-via-miniapp',
-						data:{ code:res.code },
-						method: 'post',
-						success:(res)=>{
-							tui.is_online = res.data.data.is_online;
-							if (!res.data.data.is_online) {
-								uni.navigateTo({
-									url: '/pages/blank/blank'
-								});
-								return;
+			uni.getProvider({
+				service: 'oauth',
+				success(res) {
+					console.log(res);
+					if (res.provider && res.provider.length) {
+						uni.login({
+						  success (res) {
+						    if (res.code) {
+								//发起网络请求
+								uni.request({
+									url: tui.interfaceUrl() + 'api/login-via-miniapp',
+									data:{ code:res.code },
+									method: 'post',
+									success:(res)=>{
+										tui.is_online = res.data.data.is_online;
+										if (!res.data.data.is_online) {
+											uni.navigateTo({
+												url: '/pages/blank/blank'
+											});
+											return;
+										}
+										if(res.data.success){
+											if(res.data.data.token){
+												tui.setToken(res.data.data.token);
+												// if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/msgList/msgList') {
+												// 	uni.navigateTo({
+												// 		url: '/pages/msgList/msgList'
+												// 	});
+												// }
+											}
+										}else if(res.data.code === 401){
+											if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
+											uni.navigateTo({
+												url: '/pages/common/bind/bind'
+											});
+										}
+									}
+								})
 							}
-							if(res.data.success){
-								if(res.data.data.token){
-									tui.setToken(res.data.data.token);
-									// if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/msgList/msgList') {
-									// 	uni.navigateTo({
-									// 		url: '/pages/msgList/msgList'
-									// 	});
-									// }
-								}
-							}else if(res.data.code === 401){
-								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route && getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
-								uni.navigateTo({
-									url: '/pages/common/bind/bind'
-								});
-							}
-						}
-					})
-				}
-			  }
-			})
+						  }
+						});
+					} else {
+						// H5						
+						uni.navigateTo({
+							url: '/pages/login/h5'
+						});
+					}
+				},
+				fail(res) {
+					console.log(res);
+				},
+			});
 		},
 		onShow: function() {
 

@@ -33,6 +33,16 @@
 			}
 		},
 		{
+			"path": "pages/login/h5",
+			"style": {
+				"navigationBarTitleText": "账号登录",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+		},
+		{
 			"path": "pages/friendList/friendList",
 			"style": {
 				"navigationBarTitleText": "访客",
