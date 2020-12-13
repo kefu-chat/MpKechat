@@ -26,7 +26,7 @@
 				<view class="tui-send-box">
 					<view class="tui-icon tui-icon-im_voice" v-if="!isVoice && !content" @tap="switchVoice"></view>
 					<view class="tui-icon tui-icon-im_keyboard" v-if="isVoice && !content" @tap="switchInput"></view>
-					<view class="tui-btn-send" v-if="content" :style="{ color: color }" hover-class="tui-opcity" :hover-stay-time="150" @taps="hideKeyboard">{{ sendText }}</view>
+					<view class="tui-btn-send" v-if="content" :style="{ color: color }" hover-class="tui-opcity" :hover-stay-time="150" @taps="hideKeyboard" @click="sendMessage()">{{ sendText }}</view>
 				</view>
 			</view>
 			<view class="tui-reply-more">
@@ -76,10 +76,15 @@
 <script>
 //聊天栏 回复栏
 const emoji = require('@/utils/emoji.js');
+import tui from '@/common/httpRequest.js';
 export default {
 	name: 'tChatBar',
 	props: {
 		//禁用聊天栏
+		conversationId: {
+			type: String,
+			required: true
+		},
 		isLocked: {
 			type: Boolean,
 			default: false
@@ -101,7 +106,8 @@ export default {
 		color: {
 			type: String,
 			default: '#5677fc'
-		}
+		},
+
 	},
 	created() {
 		//键盘高度监听
@@ -117,6 +123,7 @@ export default {
 				}
 			}, 100);
 		});
+		
 	},
 	data() {
 		return {
@@ -132,6 +139,7 @@ export default {
 		hideKeyboard() {
 			//隐藏键盘
 			this.showIndex = 0;
+			console.log('21212')
 			// uni.hideKeyboard();
 		},
 		showKeyBoard(index) {
@@ -160,6 +168,17 @@ export default {
 		},
 		switchInput() {
 			this.isVoice = false;
+		},
+		sendMessage() {
+			const req = {
+				content:this.content,
+				type:1
+			}
+			tui.request('api/conversation/' + this.conversationId + '/send-message', 'post',req).then(res => {
+				if (res.success) {
+					this.content = null;
+				}
+			})
 		}
 	}
 };

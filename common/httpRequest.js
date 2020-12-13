@@ -6,12 +6,29 @@
 const tui = {
 	//接口地址
 	is_online:false,
+	laravelEcho:null,
+	institutionId:function(){
+		return uni.getStorageSync("institutionId")
+	},
+	userId:function(){
+		return uni.getStorageSync("userId")
+	},
+	setUserId:function(id){
+		uni.setStorageSync("userId",id)
+	},
+	setInstitutionId:function(id){
+		uni.setStorageSync("institutionId",id)
+	},
 	interfaceUrl: function() {
-		//return 'http://dev.fastsupport.cn/'
-		//return 'https://kefu.ssl.digital/';
-		return 'https://api.kefu.chat/'
+		// return 'http://dev.fastsupport.cn/'
+		return 'http://127.0.0.1/'
+		// return 'https://kefu.ssl.digital/';
+		// return 'https://api.kefu.chat/'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
+	},
+	socketUrl:function() {
+		return 'http://127.0.0.1:6001/'
 	},
 	toast: function(text, duration, success) {
 		uni.showToast({

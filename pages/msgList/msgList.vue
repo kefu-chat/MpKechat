@@ -10,18 +10,20 @@
 		<!--searchbox-->
 
 		<block v-for="(item,index) in msgList" :key="item.id">
-			<tui-list-cell @click="detail(item.id)" :unlined="true">
+			<tui-list-cell @click="detail(item)" :unlined="true">
 				<view class="tui-chat-item">
 					<view class="tui-msg-box">
-						<image :src="item.visitor.avatar?item.visitor.avatar:'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'" class="tui-msg-pic" mode="widthFix"></image>
+						<image :src="item.visitor.avatar?item.visitor.avatar:'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'"
+						 class="tui-msg-pic" mode="widthFix"></image>
 						<view class="tui-msg-item">
 							<view class="tui-msg-name">{{item.visitor.name}}</view>
-							<view class="tui-msg-content">{{item.last_message.type==2?'[图片]':item.last_message.content}}</view>
+							<view class="tui-msg-content">{{item.last_message.sender_id == tui.userId() ?'你':item.last_message.sender.name}}: {{item.last_message.type==2?'[图片]':item.last_message.content}}</view>
 						</view>
 					</view>
 					<view class="tui-msg-right tui-right-dot">
-						<uni-dateformat style="width: 90px; display: block; right: 15px; position: absolute;" :date="item.last_reply_at" format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
-						<tui-badge type="danger" dot="true" v-if="item.hasNotRead"></tui-badge>
+						<uni-dateformat style="width: 90px; display: block; right: 15px; position: absolute;" :date="item.last_reply_at"
+						 format="yyyy-MM-dd hh:mm" :threshold="[60000, 36000000000]"></uni-dateformat>
+						<tui-badge type="danger" class="badge" dot="true" v-if="item.hasNotRead"></tui-badge>
 					</view>
 				</view>
 			</tui-list-cell>
@@ -38,22 +40,26 @@
 			return {
 				current: 0,
 				msgList: [],
-				token:null
+				token: null
 			}
 		},
 		mounted() {
-			const timeout = setInterval(()=>{
-				if(tui.getToken()){
+			const timeout = setInterval(() => {
+				if (tui.getToken() && tui.laravelEcho) {
 					this.getData();
+					console.log('institutionId', tui.institutionId());
+					console.log('userid', tui.userId());
 					clearInterval(timeout);
 				}
 			}, 100)
 		},
 		methods: {
-			getData:function(){
-				tui.request('api/conversation/list?type=active','get').then(res=>{
-					if(res.success){
+			getData: function() {
+				tui.request('api/conversation/list?type=active', 'get').then(res => {
+					if (res.success) {
 						this.msgList = res.data.conversations;
+						this.unAssignedChannel();
+						this.assignedChannel();
 					}
 				})
 			},
@@ -62,13 +68,58 @@
 					url: '../../news/search/search'
 				})
 			},
-			detail: function(id) {
+			detail: function(item) {
 				subscribe(() => {
+					item.hasNotRead = false;
+					this.$forceUpdate();
 					uni.navigateTo({
-						url: '../chat/chat?id='+id,
+						url: '../chat/chat?id=' + item.id,
 					})
+
 				});
-			}
+			},
+			unAssignedChannel: function() {
+				tui.laravelEcho.join(`institution.${tui.institutionId()}`)
+					.listen(`.conversation.created`, (conversation) => {
+						for(const i of this.msgList){
+							if(i.id === conversation.conversation_id){
+								return;
+							}
+						}
+						this.msgList.unshift(conversation);
+					})
+					.listen(`.message.created`, (message) => {
+						this.msgList.filter(v => {
+							if (v.id === message.conversation_id) {
+								v.last_message = message;
+								if(message.sender_type_text === 'visitor'){
+									v.hasNotRead = true;
+								}
+							}
+						});
+					})
+			},
+			assignedChannel: function() {
+				tui.laravelEcho.join(`institution.${tui.institutionId()}.assigned.${tui.userId()}`)
+					.listen(`.conversation.created`, (conversation) => {
+						for(const i of this.msgList){
+							if(i.id === conversation.conversation_id){
+								return;
+							}
+						}
+						this.msgList.unshift(conversation);
+					})
+					.listen(`.message.created`, (message) => {
+						this.msgList.filter(v => {
+							if (v.id === message.conversation_id) {
+								v.last_message = message;
+								if(message.sender_type_text === 'visitor'){
+									v.hasNotRead = true;
+								}
+							}
+						});
+					})
+			},
 		},
 		onPullDownRefresh: function() {
 			this.getData();
@@ -78,7 +129,6 @@
 </script>
 
 <style>
-
 	/*tabbar*/
 
 	.tui-tabbar {
@@ -241,5 +291,9 @@
 		font-size: 24rpx;
 		line-height: 24rpx;
 		color: #9397a4;
+	}
+	.badge{
+		margin-top:60rpx;
+		margin-right: 20rpx;
 	}
 </style>
