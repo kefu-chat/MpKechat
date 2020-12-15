@@ -83,6 +83,10 @@ export default {
 		//禁用聊天栏
 		conversationId: {
 			type: String,
+			required: false
+		},
+		webSocket: {
+			type: Object,
 			required: true
 		},
 		isLocked: {
@@ -178,6 +182,8 @@ export default {
 				if (res.success) {
 					this.content = null;
 				}
+
+				this.webSocket.whisper(`message`, res.data.message);
 			})
 		}
 	}

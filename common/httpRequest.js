@@ -21,14 +21,14 @@ const tui = {
 	},
 	interfaceUrl: function() {
 		// return 'http://dev.fastsupport.cn/'
-		return 'http://127.0.0.1/'
+		// return 'http://127.0.0.1/'
 		// return 'https://kefu.ssl.digital/';
-		// return 'https://api.kefu.chat/'
+		return 'https://api.kefu.chat/'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
 	},
 	socketUrl:function() {
-		return 'http://127.0.0.1:6001/'
+		return 'https://api.kefu.chat/'
 	},
 	toast: function(text, duration, success) {
 		uni.showToast({

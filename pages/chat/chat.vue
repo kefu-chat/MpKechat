@@ -97,7 +97,7 @@
 				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
 			</view> -->
 		</view>
-		<t-chat-bar :conversation-id='conversationId'></t-chat-bar>
+		<t-chat-bar :conversation-id='conversationId' :web-socket='socket'></t-chat-bar>
 	</view>
 </template>
 
@@ -116,7 +116,8 @@
 				show: false,
 				has_previous: false,
 				chatList: {},
-				conversationId: null
+				conversationId: null,
+				socket: null,
 			};
 		},
 		onLoad: function(options) {
@@ -144,8 +145,8 @@
 								}
 								chatList[day].push(i)
 							}
-
 						}
+						console.log(chatList)
 						this.chatList = chatList;
 						this.initSocket();
 						setTimeout(() => {
@@ -164,7 +165,7 @@
 			},
 			initSocket(){
 				const channel = `conversation.${this.conversationId}`;
-				tui.laravelEcho.join(channel)
+				this.socket = tui.laravelEcho.join(channel)
 				      .here(console.log)
 				      .joining(console.log)
 				      .leaving((user) => {
