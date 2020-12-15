@@ -97,7 +97,7 @@
 				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
 			</view> -->
 		</view>
-		<t-chat-bar :conversation-id='conversationId' :web-socket='socket'></t-chat-bar>
+		<t-chat-bar :conversation-id='conversationId' @messageCreated="messageSent"></t-chat-bar>
 	</view>
 </template>
 
@@ -117,7 +117,6 @@
 				has_previous: false,
 				chatList: {},
 				conversationId: null,
-				socket: null,
 			};
 		},
 		onLoad: function(options) {
@@ -163,35 +162,39 @@
 					})
 				}).exec()
 			},
+			messageSent(message) {			
+				const day = utils.formatDate(message.created_at);
+				if (!this.chatList[day]) {
+					this.chatList[day] = [];
+				}
+				this.chatList[day].push(message)
+				console.log(message)
+				this.$forceUpdate();
+
+				setTimeout(() => {
+				  this.scrollBottomFn();
+				}, 200);
+			},
 			initSocket(){
 				const channel = `conversation.${this.conversationId}`;
-				this.socket = tui.laravelEcho.join(channel)
-				      .here(console.log)
-				      .joining(console.log)
-				      .leaving((user) => {
-				        // if (user.id !== this.visitor.id) {
-				        //   return;
-				        // }
-				
-				        // this.conversation.online_status = false;
-				      })
-				      // .listen(".message.created", (e) => {
-				      //   this.messageList.push(e);
-				      //   setTimeout(() => {
-				      //     this.scrollTo();
-				      //   }, 200);
-				      // })
-				      .listenForWhisper("message", (evt) => {
-						  const day = utils.formatDate(evt.created_at);
-						  if (!this.chatList[day]) {
-						  	this.chatList[day] = [];
-						  }
-						  this.chatList[day].push(evt)
-						  console.log(evt)
-				        setTimeout(() => {
-				          this.scrollBottomFn();
-				        }, 200);
-				      })
+				tui.chatSocket = tui.laravelEcho.join(channel);
+
+				tui.chatSocket.here(console.log)
+				  .joining(console.log)
+				  .leaving((user) => {
+					// if (user.id !== this.visitor.id) {
+					//   return;
+					// }
+			
+					// this.conversation.online_status = false;
+				  })
+				  // .listen(".message.created", (e) => {
+				  //   this.messageList.push(e);
+				  //   setTimeout(() => {
+				  //     this.scrollTo();
+				  //   }, 200);
+				  // })
+				  .listenForWhisper("message", (message) => this.messageSent(message))
 			}
 		},
 		onPageScroll(e) {

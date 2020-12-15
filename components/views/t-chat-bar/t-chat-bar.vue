@@ -77,6 +77,7 @@
 //聊天栏 回复栏
 const emoji = require('@/utils/emoji.js');
 import tui from '@/common/httpRequest.js';
+
 export default {
 	name: 'tChatBar',
 	props: {
@@ -84,10 +85,6 @@ export default {
 		conversationId: {
 			type: String,
 			required: false
-		},
-		webSocket: {
-			type: Object,
-			required: true
 		},
 		isLocked: {
 			type: Boolean,
@@ -117,6 +114,7 @@ export default {
 		//键盘高度监听
 		this.faceList = emoji.en;
 		let safeH = this.tui.isPhoneX() ? 34 : 0;
+		this.initSocket();
 		uni.onKeyboardHeightChange(res => {
 			let h = res.height - safeH;
 			this.keyboardHeight = h > 0 ? h : 0;
@@ -173,6 +171,11 @@ export default {
 		switchInput() {
 			this.isVoice = false;
 		},
+		initSocket(){
+			const channel = `conversation.${this.conversationId}`;
+			
+			tui.chatSocket = tui.laravelEcho.join(channel);
+		},
 		sendMessage() {
 			const req = {
 				content:this.content,
@@ -183,7 +186,8 @@ export default {
 					this.content = null;
 				}
 
-				this.webSocket.whisper(`message`, res.data.message);
+				tui.chatSocket.whisper(`message`, res.data.message);
+				this.$emit('messageCreated', res.data.message);
 			})
 		}
 	}
