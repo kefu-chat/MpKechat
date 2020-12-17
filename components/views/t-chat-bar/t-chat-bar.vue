@@ -199,12 +199,40 @@ export default {
 						uni.uploadFile({
 							url: tui.interfaceUrl() + 'api/file/upload',
 							header: {
-								Authorization: tui.getToken(),
+								Authorization: 'Bearer ' + tui.getToken()
 							},
 							filePath: file,
 							name: 'file',
 							success: (res) => {
-								console.log(res);
+								if (res.errMsg != "uploadFile:ok") {
+									uni.showModal({
+										content: res.errMsg,
+										showCancel: false,
+									});
+									return;
+								}
+
+								const data = JSON.parse(res.data);
+								if (!data.success) {
+									uni.showModal({
+										content: data.message,
+										showCancel: false,
+									});
+									return;
+								}
+								
+								const req = {
+									content: data.data.url,
+									type: 2
+								}
+								tui.request('api/conversation/' + this.conversationId + '/send-message', 'post',req).then(res => {
+									if (res.success) {
+										this.content = null;
+									}
+							
+									tui.chatSocket.whisper(`message`, res.data.message);
+									this.$emit('messageCreated', res.data.message);
+								})
 							}
 						})
 					})
