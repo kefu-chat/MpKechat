@@ -43,10 +43,11 @@
 					</view>
 				</view>
 				<view class="tui-more-box" :style="{ height: replyContainerH + 'px' }" v-if="showIndex == 3">
-					<view class="tui-more-item" hover-class="tui-opcity" :hover-stay-time="150">
+					<view @click="chooseImageToSend()" class="tui-more-item" hover-class="tui-opcity" :hover-stay-time="150">
 						<view class="tui-more-icon"><view class="tui-icon tui-icon-photo"></view></view>
 						<text class="tui-more-text">照片</text>
 					</view>
+					<!--
 					<view class="tui-more-item" hover-class="tui-opcity" :hover-stay-time="150">
 						<view class="tui-more-icon"><view class="tui-icon tui-icon-video"></view></view>
 						<text class="tui-more-text">视频通话</text>
@@ -59,6 +60,7 @@
 						<view class="tui-more-icon"><view class="tui-icon tui-icon-location"></view></view>
 						<text class="tui-more-text">定位</text>
 					</view>
+					-->
 				</view>
 			</view>
 			<view class="tui-inner-mask" v-if="isLocked"></view>
@@ -188,6 +190,25 @@ export default {
 
 				tui.chatSocket.whisper(`message`, res.data.message);
 				this.$emit('messageCreated', res.data.message);
+			})
+		},
+		chooseImageToSend() {
+			uni.chooseImage({
+				success: (res) => {
+					res.tempFilePaths.forEach((file) => {
+						uni.uploadFile({
+							url: tui.interfaceUrl() + 'api/file/upload',
+							header: {
+								Authorization: tui.getToken(),
+							},
+							filePath: file,
+							name: 'file',
+							success: (res) => {
+								console.log(res);
+							}
+						})
+					})
+				}
 			})
 		}
 	}
