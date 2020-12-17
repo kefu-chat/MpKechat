@@ -41,8 +41,10 @@ export default {
 		bind:function(){
 			wx.scanCode({
 				success: (res) => {
-					console.log(res)
-				    this.data = res;
+					console.log(res.result)
+					uni.navigateTo({
+						url: res.result
+					});
 				  }
 			})
 		},
