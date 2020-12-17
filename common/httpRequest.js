@@ -2,22 +2,24 @@
  * 常用方法封装 请求，文件上传等
  * @author echo. 
  **/
+const io = require('libs/weapp.socket.io.js')
+const Echo = require("libs/echo.js")
 
 const tui = {
 	//接口地址
-	is_online:false,
-	laravelEcho:null,
-	institutionId:function(){
+	is_online: false,
+	laravelEcho: null,
+	institutionId: function() {
 		return uni.getStorageSync("institutionId")
 	},
-	userId:function(){
+	userId: function() {
 		return uni.getStorageSync("userId")
 	},
-	setUserId:function(id){
-		uni.setStorageSync("userId",id)
+	setUserId: function(id) {
+		uni.setStorageSync("userId", id)
 	},
-	setInstitutionId:function(id){
-		uni.setStorageSync("institutionId",id)
+	setInstitutionId: function(id) {
+		uni.setStorageSync("institutionId", id)
 	},
 	interfaceUrl: function() {
 		// return 'http://dev.fastsupport.cn/'
@@ -27,7 +29,7 @@ const tui = {
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
 	},
-	socketUrl:function() {
+	socketUrl: function() {
 		return 'https://api.kefu.chat/'
 	},
 	toast: function(text, duration, success) {
@@ -61,8 +63,8 @@ const tui = {
 	isPhoneX: function() {
 		const res = uni.getSystemInfoSync();
 		let iphonex = false;
-		let models=['iphonex','iphonexr','iphonexsmax','iphone11','iphone11pro','iphone11promax']
-		const model=res.model.replace(/\s/g,"").toLowerCase()
+		let models = ['iphonex', 'iphonexr', 'iphonexsmax', 'iphone11', 'iphone11pro', 'iphone11promax']
+		const model = res.model.replace(/\s/g, "").toLowerCase()
 		if (models.includes(model)) {
 			iphonex = true;
 		}
@@ -76,9 +78,9 @@ const tui = {
 		return time
 	},
 	delayed: null,
-	login:async function(){
-		return new Promise((resolve,reject)=>{
-			
+	login: async function() {
+		return new Promise((resolve, reject) => {
+
 		})
 	},
 	/**
@@ -95,7 +97,7 @@ const tui = {
 	 *  true: 隐藏
 	 *  false:显示
 	 */
-	request: async function(url, method, postData, isDelay, isForm, hideLoading,callback) {
+	request: async function(url, method, postData, isDelay, isForm, hideLoading, callback) {
 		//接口请求
 		let loadding = false;
 		tui.delayed && uni.hideLoading();
@@ -202,8 +204,8 @@ const tui = {
 		//uni.setStorageSync("thorui_token", token)
 		uni.setStorageSync("thorui_mobile", mobile)
 	},
-	setToken(token){
-		uni.setStorageSync("thorui_token",token)
+	setToken(token) {
+		uni.setStorageSync("thorui_token", token)
 	},
 	//获取token
 	getToken() {
@@ -224,6 +226,58 @@ const tui = {
 				url: url
 			});
 		}
+	},
+	login: function(call) {
+		uni.login({
+			success(res) {
+				if (res.code) {
+					//发起网络请求
+					uni.request({
+						url: tui.interfaceUrl() + 'api/login-via-miniapp',
+						data: {
+							code: res.code
+						},
+						method: 'post',
+						success: (res) => {
+							tui.is_online = res.data.is_online || res.data.data.is_online;
+							if (!tui.is_online) {
+								uni.navigateTo({
+									url: '/pages/blank/blank'
+								});
+								return;
+							}
+							if (res.data.success) {
+								if (res.data.data.token) {
+									console.log('23232323232323')
+									tui.setInstitutionId(res.data.data.institution.id);
+									tui.setUserId(res.data.data.user.id);
+									tui.setToken(res.data.data.token);
+									tui.initLaravelEcho(res.data.data.token);
+									if (call) call();
+								}
+							} else if (res.data.code === 401) {
+								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route &&
+									getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
+									uni.navigateTo({
+										url: '/pages/common/bind/bind'
+									});
+							}
+						}
+					})
+				}
+			}
+		});
+	},
+	initLaravelEcho: function(token) {
+		tui.laravelEcho = new Echo({
+			broadcaster: 'socket.io',
+			host: tui.socketUrl(), //地址填写实际项目的地址
+			auth: {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		});
 	}
 }
 

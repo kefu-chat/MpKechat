@@ -20,6 +20,7 @@
 
 <script>
 import { mapMutations } from 'vuex';
+import tui from '@/common/httpRequest.js';
 const util = require('@/utils/util.js');
 const form = require('@/components/common/tui-validation/tui-validation.js');
 
@@ -107,9 +108,14 @@ export default {
 								content: '绑定成功!',
 								showCancel: false,
 								success: () => {
-									uni.redirectTo({
-										url: '/pages/msgList/msgList',
-									});
+									tui.login(
+										()=>{
+											uni.reLaunch({
+												url: '/pages/msgList/msgList',
+											});
+										}
+									)
+									
 								}
 							});
 						},
