@@ -118,7 +118,7 @@ const tui = {
 				data: postData,
 				header: {
 					'content-type': isForm ? 'application/x-www-form-urlencoded' : 'application/json',
-					'Authorization': 'Bearer ' + tui.getToken()
+					Authorization: 'Bearer ' + tui.getToken()
 				},
 				method: method, //'GET','POST'
 				dataType: 'json',
@@ -164,7 +164,7 @@ const tui = {
 				filePath: src,
 				name: 'imageFile',
 				header: {
-					'Authorization': tui.getToken()
+					Authorization: tui.getToken()
 				},
 				formData: {
 					// sizeArrayText:""

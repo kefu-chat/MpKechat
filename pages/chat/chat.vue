@@ -22,7 +22,7 @@
 						<image :src="item.sender.avatar ? item.sender.avatar : 'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'"
 						 class="tui-user-pic tui-left" v-if="item.sender_type_text =='visitor'"></image>
 						<view class="tui-chatbox" :class="item.sender_type_text =='visitor'?'tui-chatbox-left':'tui-chatbox-right'" v-if="item.type == 1">{{item.content}}</view>
-						<image :src="item.content" class="tui-chatbox" :class="item.sender_type_text =='visitor'?'tui-chatbox-left':'tui-chatbox-right'"
+						<image @click="previewImage(item.content)" :src="item.content" class="tui-chatbox" :class="item.sender_type_text =='visitor'?'tui-chatbox-left':'tui-chatbox-right'"
 						 v-if="item.type == 2" />
 						<image :src="item.sender.avatar ? item.sender.avatar : 'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'"
 						 class="tui-user-pic tui-left" v-if="item.sender_type_text !='visitor'"></image>
@@ -174,6 +174,12 @@
 				setTimeout(() => {
 				  this.scrollBottomFn();
 				}, 200);
+			},
+			previewImage(src) {
+				uni.previewImage({
+					current: src,
+					urls: Object.values(this.chatList).flat().filter(msg => msg.type == 2).map(msg => msg.content),
+				});
 			},
 			initSocket(){
 				const channel = `conversation.${this.conversationId}`;
