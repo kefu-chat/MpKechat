@@ -1,128 +1,182 @@
 <template>
-	<view class="tui-page">
-		<scroll-view class="tui-scrollList" scroll-y :scroll-into-view="scrollViewId" :style="{height:winHeight + 'px'}">
-			<!--searchbox-->
-			<view class="tui-searchbox">
-				<view class="tui-search-input" @tap="search">
-					<icon type="search" :size='15' color='#999'></icon>
-					<text class="tui-search-text">搜索</text>
-				</view>
-			</view>
-			<tui-list-cell :unlined="true" @click="detail">
-				<view class="tui-friend-item">
-					<image src="/static/images/news/2.jpg" class="tui-img"></image>
-					<view class="tui-name">新的朋友</view>
-				</view>
-			</tui-list-cell>
-			<!--searchbox-->
-			<!--联系人列表-->
-			<view class="tui-list city-list">
-				<block v-for="(list,index) in lists" :key="index">
-					<view class="tui-list-cell-divider" :id="list.letter">
-						{{list.letter=="well"?"#":list.letter}}
-					</view>
-					<tui-list-cell :unlined="last(list.data,index2)" @click="detail" v-for="(item,index2) in list.data" :key="index2">
-						<view class="tui-friend-item">
-							<image :src="'/static/images/news/'+((index2%2===0 && index2!==0)?'avatar_1.jpg':'avatar_2.jpg')" class="tui-img"></image>
-							<view class="tui-name">{{item.name}}</view>
-						</view>
-					</tui-list-cell>
-				</block>
-			</view>
-			<!--联系人列表-->
-			<view class="tui-footer">120位联系人</view>
-			<view class="tui-safearea-bottom"></view>
-		</scroll-view>
-		<view class="tui-indexed-list-bar" :style="{height:indexBarHeight+'px'}" @touchstart.stop="touchStart"
-		 @touchmove.stop="touchMove" @touchend.stop="touchEnd" @touchcancel.stop="touchCancel">
-			<view v-for="(items,index3) in lists" :key="index3" class="tui-indexed-list-text" :style="{height:indexBarItemHeight+'px'}">
-				{{items.letter=="well"?"#":items.letter}}
-			</view>
-		</view>
-		<view class="tui-indexed-list-alert" v-if="touchmove && lists[touchmoveIndex].letter">
-			<text>{{lists[touchmoveIndex].letter=="well"?"#":lists[touchmoveIndex].letter}}</text>
-		</view>
-	</view>
+  <view class="tui-page">
+    <scroll-view
+      class="tui-scrollList"
+      scroll-y
+      :scroll-into-view="scrollViewId"
+      :style="{height:winHeight + 'px'}"
+    >
+      <!--searchbox-->
+      <view class="tui-searchbox">
+        <view
+          class="tui-search-input"
+          @tap="search"
+        >
+          <icon
+            type="search"
+            :size="15"
+            color="#999"
+          />
+          <text class="tui-search-text">
+            搜索
+          </text>
+        </view>
+      </view>
+      <tui-list-cell
+        :unlined="true"
+        @click="detail"
+      >
+        <view class="tui-friend-item">
+          <image
+            src="/static/images/news/2.jpg"
+            class="tui-img"
+          />
+          <view class="tui-name">
+            新的朋友
+          </view>
+        </view>
+      </tui-list-cell>
+      <!--searchbox-->
+      <!--联系人列表-->
+      <view class="tui-list city-list">
+        <block
+          v-for="(list,index) in lists"
+          :key="index"
+        >
+          <view
+            :id="list.letter"
+            class="tui-list-cell-divider"
+          >
+            {{ list.letter=="well"?"#":list.letter }}
+          </view>
+          <tui-list-cell
+            v-for="(item,index2) in list.data"
+            :key="index2"
+            :unlined="last(list.data,index2)"
+            @click="detail"
+          >
+            <view class="tui-friend-item">
+              <image
+                :src="'/static/images/news/'+((index2%2===0 && index2!==0)?'avatar_1.jpg':'avatar_2.jpg')"
+                class="tui-img"
+              />
+              <view class="tui-name">
+                {{ item.name }}
+              </view>
+            </view>
+          </tui-list-cell>
+        </block>
+      </view>
+      <!--联系人列表-->
+      <view class="tui-footer">
+        120位联系人
+      </view>
+      <view class="tui-safearea-bottom" />
+    </scroll-view>
+    <view
+      class="tui-indexed-list-bar"
+      :style="{height:indexBarHeight+'px'}"
+      @touchstart.stop="touchStart"
+      @touchmove.stop="touchMove"
+      @touchend.stop="touchEnd"
+      @touchcancel.stop="touchCancel"
+    >
+      <view
+        v-for="(items,index3) in lists"
+        :key="index3"
+        class="tui-indexed-list-text"
+        :style="{height:indexBarItemHeight+'px'}"
+      >
+        {{ items.letter=="well"?"#":items.letter }}
+      </view>
+    </view>
+    <view
+      v-if="touchmove && lists[touchmoveIndex].letter"
+      class="tui-indexed-list-alert"
+    >
+      <text>{{ lists[touchmoveIndex].letter=="well"?"#":lists[touchmoveIndex].letter }}</text>
+    </view>
+  </view>
 </template>
 
 <script>
-	const cityData = require('@/utils/index.list.js')
-	export default {
-		computed: {
-			last() {
-				return function(data, index) {
-					return data.length - 1 == index ? true : false
-				}
-			}
-		},
-		data() {
-			return {
-				lists: [],
-				touchmove: false, // 是否在索引表上滑动
-				touchmoveIndex: -1,
-				titleHeight: 0, // A字距离窗口顶部的高度
-				indexBarHeight: 0, // 索引表高度
-				indexBarItemHeight: 0, // 索引表子项的高度
-				scrollViewId: '', // scroll-view滚动到的子元素的id
-				winHeight: 0
-			}
-		},
-		onLoad: function(options) {
-			const that = this;
-			setTimeout(() => {
-				uni.getSystemInfo({
-					success: function(res) {
-						let winHeight = res.windowHeight;
-						let barHeight = winHeight - uni.upx2px(232);
-						that.winHeight = winHeight;
-						that.indexBarHeight = barHeight;
-						that.indexBarItemHeight = barHeight / 25;
-						that.titleHeight = uni.upx2px(132);
-						that.lists = cityData.list
-					}
-				})
-			}, 10)
-		},
-		methods: {
-			touchStart(e) {
-				this.touchmove = true
-				let pageY = e.touches[0].pageY
-				let index = Math.floor((pageY - this.titleHeight) / this.indexBarItemHeight)
-				let item = this.lists[index]
-				if (item) {
-					this.scrollViewId = item.letter;
-					this.touchmoveIndex = index
-				}
-			},
-			touchMove(e) {
-				let pageY = e.touches[0].pageY;
-				let index = Math.floor((pageY - this.titleHeight) / this.indexBarItemHeight)
-				let item = this.lists[index]
-				if (item) {
-					this.scrollViewId = item.letter;
-					this.touchmoveIndex = index
-				}
-			},
-			touchEnd() {
-				this.touchmove = false;
-				this.touchmoveIndex = -1
-			},
-			touchCancel() {
-				this.touchmove = false;
-				this.touchmoveIndex = -1
-			},
-			search: function() {
-				uni.navigateTo({
-					url: '../../news/search/search'
-				})
-			},
-			detail: function() {
-				uni.navigateTo({
-					url: '../chat/chat'
-				})
-			}
-		}
-	}
+const cityData = require('@/utils/index.list.js')
+export default {
+  data () {
+    return {
+      lists: [],
+      touchmove: false, // 是否在索引表上滑动
+      touchmoveIndex: -1,
+      titleHeight: 0, // A字距离窗口顶部的高度
+      indexBarHeight: 0, // 索引表高度
+      indexBarItemHeight: 0, // 索引表子项的高度
+      scrollViewId: '', // scroll-view滚动到的子元素的id
+      winHeight: 0
+    }
+  },
+  computed: {
+    last () {
+      return function (data, index) {
+        return data.length - 1 === index
+      }
+    }
+  },
+  onLoad: function (options) {
+    const that = this
+    setTimeout(() => {
+      uni.getSystemInfo({
+        success: function (res) {
+          const winHeight = res.windowHeight
+          const barHeight = winHeight - uni.upx2px(232)
+          that.winHeight = winHeight
+          that.indexBarHeight = barHeight
+          that.indexBarItemHeight = barHeight / 25
+          that.titleHeight = uni.upx2px(132)
+          that.lists = cityData.list
+        }
+      })
+    }, 10)
+  },
+  methods: {
+    touchStart (e) {
+      this.touchmove = true
+      const pageY = e.touches[0].pageY
+      const index = Math.floor((pageY - this.titleHeight) / this.indexBarItemHeight)
+      const item = this.lists[index]
+      if (item) {
+        this.scrollViewId = item.letter
+        this.touchmoveIndex = index
+      }
+    },
+    touchMove (e) {
+      const pageY = e.touches[0].pageY
+      const index = Math.floor((pageY - this.titleHeight) / this.indexBarItemHeight)
+      const item = this.lists[index]
+      if (item) {
+        this.scrollViewId = item.letter
+        this.touchmoveIndex = index
+      }
+    },
+    touchEnd () {
+      this.touchmove = false
+      this.touchmoveIndex = -1
+    },
+    touchCancel () {
+      this.touchmove = false
+      this.touchmoveIndex = -1
+    },
+    search: function () {
+      uni.navigateTo({
+        url: '../../news/search/search'
+      })
+    },
+    detail: function () {
+      uni.navigateTo({
+        url: '../chat/chat'
+      })
+    }
+  }
+}
 </script>
 
 <style>

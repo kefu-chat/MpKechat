@@ -1,64 +1,72 @@
 <template>
-	<view class="container">
-		<view class="tui-box">
-			<progress :percent="percent" show-info stroke-width="3" activeColor="#5677fc" active-mode="forwards" />
-			<view class="tui-text">正在更新，请耐心等待...</view>
-		</view>
-	</view>
+  <view class="container">
+    <view class="tui-box">
+      <progress
+        :percent="percent"
+        show-info
+        stroke-width="3"
+        activeColor="#5677fc"
+        active-mode="forwards"
+      />
+      <view class="tui-text">
+        正在更新，请耐心等待...
+      </view>
+    </view>
+  </view>
 </template>
 
 <script>
 export default {
-	data() {
-		return {
-			percent: 0
-		};
-	},
-	onLoad(options) {
-		// #ifdef APP-PLUS
-		this.update(options.url || '');
-		// #endif
-	},
-	onBackPress() {
-		return true;
-	},
-	methods: {
-		update(downUrl) {
-			let that = this;
-			this.percent = 5;
-			const downloadTask = uni.downloadFile({
-				url: downUrl,
-				success: downloadResult => {
-					if (downloadResult.statusCode === 200) {
-						plus.runtime.install(
-							downloadResult.tempFilePath,
-							{
-								force: true
-							},
-							function() {
-								plus.runtime.restart();
-							},
-							function(e) {
-								that.showModal();
-							}
-						);
-					}
-				},
-				fail: () => {
-					that.showModal();
-				}
-			});
-			downloadTask.onProgressUpdate(res => {
-				that.percent = res.progress;
-			});
-		},
-		showModal() {
-			this.tui.model('温馨提示', '升级失败，请稍后再试', false, res => {
-				plus.runtime.restart();
-			});
-		}
-	}
-};
+  data () {
+    return {
+      percent: 0
+    }
+  },
+  onLoad (options) {
+    // #ifdef APP-PLUS
+    this.update(options.url || '')
+    // #endif
+  },
+  onBackPress () {
+    return true
+  },
+  methods: {
+    update (downUrl) {
+      const that = this
+      this.percent = 5
+      const downloadTask = uni.downloadFile({
+        url: downUrl,
+        success: downloadResult => {
+          if (downloadResult.statusCode === 200) {
+            plus.runtime.install(
+              downloadResult.tempFilePath,
+              {
+                force: true
+              },
+              function () {
+                plus.runtime.restart()
+              },
+              function (e) {
+                that.showModal()
+              }
+            )
+          }
+        },
+        fail: () => {
+          that.showModal()
+        }
+      })
+      downloadTask.onProgressUpdate(res => {
+        that.percent = res.progress
+      })
+    },
+    showModal () {
+      this.tui.model('温馨提示', '升级失败，请稍后再试', false, res => {
+        plus.runtime.restart()
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss">
