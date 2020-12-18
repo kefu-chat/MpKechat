@@ -1,4 +1,7 @@
 export default (onComplete) => {
+	if (!uni.canIUse('requestSubscribeMessage') || !uni.requestSubscribeMessage) {
+		return onComplete();
+	}
 	uni.requestSubscribeMessage({
 		tmplIds:[
 			'LHgTmtQNNOiAZ8qNL9g4y3RFTOmlMUeaPNkfs5Trte8',

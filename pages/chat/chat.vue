@@ -169,7 +169,9 @@
 				}
 				this.chatList[day].push(message)
 				console.log(message)
-				this.$forceUpdate();
+				if (this.$forceUpdate) {
+					this.$forceUpdate();
+				}
 
 				setTimeout(() => {
 				  this.scrollBottomFn();

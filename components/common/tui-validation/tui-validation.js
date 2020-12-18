@@ -120,7 +120,7 @@ const form = {
 		return /^(?:13\d|14\d|15\d|16\d|17\d|18\d|19\d)\d{5}(\d{3}|\*{3})$/.test(value);
 	},
 	_isEmail: function(value) {
-		return /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value);
+		return /^[a-zA-Z\.\-\_]+\@[a-zA-Z\.\-\_]+$/.test(value);
 	},
 	_isCarNo: function(value) {
 		// 新能源车牌
