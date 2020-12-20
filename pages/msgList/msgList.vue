@@ -165,7 +165,7 @@
 		},
 		methods: {
 			init: function() {
-				let timeout = setInterval(() => {
+				const ajaxLoop = setInterval(() => {
 					this.is_online = uni.getStorageSync("is_online");
 					if (tui.getToken()) {
 						this.getData();
@@ -179,7 +179,16 @@
 						});
 						console.log('institutionId', tui.institutionId());
 						console.log('userid', tui.userId());
-						clearInterval(timeout);
+						clearInterval(ajaxLoop);
+					}
+				}, 100);
+
+				const socketLoop = setInterval(() => {
+					if (tui.laravelEcho) {
+						this.unAssignedChannel();
+						this.assignedChannel();
+
+						clearInterval(socketLoop);
 					}
 				}, 100)
 			},
@@ -187,8 +196,6 @@
 				tui.request('api/conversation/list?type=active' + (this.keyword ? ('&keyword=' + this.keyword) : ''), 'get',).then(res => {
 					if (res.success) {
 						this.conversationList = res.data.conversations;
-						this.unAssignedChannel();
-						this.assignedChannel();
 					}
 				})
 			},

@@ -19,6 +19,8 @@
 							uni.navigateTo({
 								url: '/pages/login/h5'
 							});
+						} else {
+							tui.initLaravelEcho(tui.getToken());
 						}
 					}
 				},
