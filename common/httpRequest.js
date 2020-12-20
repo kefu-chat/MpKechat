@@ -7,6 +7,7 @@ const Echo = require("libs/echo.js")
 
 const tui = {
 	//接口地址
+	version: '1.0.6',
 	is_online: false,
 	laravelEcho: null,
 	institutionId: function() {
@@ -221,7 +222,7 @@ const tui = {
 			});
 		}
 	},
-	login: function(call) {
+	login: function(callback) {
 		uni.login({
 			success(res) {
 				if (res.code) {
@@ -229,15 +230,13 @@ const tui = {
 					uni.request({
 						url: tui.interfaceUrl() + 'api/login-via-miniapp',
 						data: {
-							code: res.code
+							code: res.code,
+							version: tui.version
 						},
 						method: 'post',
 						success: (res) => {
-							tui.is_online = res.data.is_online || res.data.data.is_online;
+							tui.is_online = res.data.is_online;
 							if (!tui.is_online) {
-								uni.navigateTo({
-									url: '/pages/blank/blank'
-								});
 								return;
 							}
 							if (res.data.success) {
@@ -247,14 +246,17 @@ const tui = {
 									tui.setUserId(res.data.data.user.id);
 									tui.setToken(res.data.data.token);
 									tui.initLaravelEcho(res.data.data.token);
-									if (call) call();
+									if (callback) callback();
 								}
 							} else if (res.data.code === 401) {
+								uni.clearStorage();
 								if (getCurrentPages && getCurrentPages().reverse()[0] && getCurrentPages().reverse()[0].route &&
-									getCurrentPages().reverse()[0].route != 'pages/common/scan/scan')
-									uni.navigateTo({
+									getCurrentPages().reverse()[0].route != 'pages/common/scan/scan') {
+									uni.reLaunch({
 										url: '/pages/common/bind/bind'
 									});
+								}
+
 							}
 						}
 					})
