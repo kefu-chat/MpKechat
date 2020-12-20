@@ -13,7 +13,7 @@
 					<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
 				</view>
 			</view> -->
-			<view v-for="(value, key) in chatList" :key=key>
+			<view v-for="(value, key) in messageList" :key=key>
 				<view class="tui-chat-center">
 					<uni-dateformat :date="value[0].created_at" format="yyyy-MM-dd hh:mm"></uni-dateformat>
 				</view>
@@ -115,7 +115,7 @@
 				loadding: false,
 				show: false,
 				has_previous: false,
-				chatList: {},
+				messageList: {},
 				conversationId: null,
 			};
 		},
@@ -124,35 +124,36 @@
 				const id = location.hash.split('?')[1].match(/[\W]?id=([^\?^\&]+)/)[1];
 				options = {id};
 			}
-			console.log(Object.keys(options), location, location.hash)
 			this.getChatDetail(options.id);
 		},
 		beforeDestroy() {
 			const channel = `conversation.${this.conversationId}`;
 			tui.chatSocket = tui.laravelEcho.leave(channel);
 		},
+		onNavigationBarButtonTap(e) {
+			console.log(e)
+		},
 		methods: {
 			getChatDetail: function(id) {
 				this.conversationId = id;
-				this.chatList = {}
-				const chatList = {}
+				this.messageList = {}
+				const messageList = {}
 				tui.request('api/conversation/' + id + '/messages', 'get').then(res => {
 					if (res.success) {
 						uni.setNavigationBarTitle({
-							title: res.data.conversation.visitor.name
+							title: res.data.conversation.visitor.name + (res.data.conversation.online_status ? '' : '(已离线)')
 						});
 						this.has_previous = res.data.has_previous;
 						for (const i of res.data.messages) {
 							if (i.created_at) {
 								const day = utils.formatDate(i.created_at);
-								if (!chatList[day]) {
-									chatList[day] = [];
+								if (!messageList[day]) {
+									messageList[day] = [];
 								}
-								chatList[day].push(i)
+								messageList[day].push(i)
 							}
 						}
-						console.log(chatList)
-						this.chatList = chatList;
+						this.messageList = messageList;
 						this.initSocket();
 						setTimeout(() => {
 							this.scrollBottomFn()
@@ -170,10 +171,10 @@
 			},
 			messageSent(message) {			
 				const day = utils.formatDate(message.created_at);
-				if (!this.chatList[day]) {
-					this.chatList[day] = [];
+				if (!this.messageList[day]) {
+					this.messageList[day] = [];
 				}
-				this.chatList[day].push(message)
+				this.messageList[day].push(message)
 				console.log(message)
 				if (this.$forceUpdate) {
 					this.$forceUpdate();
@@ -186,7 +187,7 @@
 			previewImage(src) {
 				uni.previewImage({
 					current: src,
-					urls: Object.values(this.chatList).flat().filter(msg => msg.type == 2).map(msg => msg.content),
+					urls: Object.values(this.messageList).flat().filter(msg => msg.type == 2).map(msg => msg.content),
 				});
 			},
 			initSocket(){

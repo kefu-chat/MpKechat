@@ -97,7 +97,7 @@
 								<image :src="item.visitor.avatar?item.visitor.avatar:'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'"
 								 class="tui-msg-pic" mode="widthFix"></image>
 								<view class="tui-msg-item">
-									<view class="tui-msg-name">{{item.visitor.name}}</view>
+									<view class="tui-msg-name">{{item.visitor.name}} <text style="color: #aaa; margin-left: 7px;" v-if="!item.online_status">(已离线)</text></view>
 									<view class="tui-msg-content">{{item.last_message.sender_id == tui.userId() ?'你':item.last_message.sender.name}}: {{item.last_message.type==2?'[图片]':item.last_message.content}}</view>
 								</view>
 							</view>
