@@ -3,7 +3,7 @@
 		{
 			"path": "pages/msgList/msgList",
 			"style": {
-				"navigationBarTitleText": "消息 ",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": true,
 				"app-plus": {
 					"bounce": "vertical"
