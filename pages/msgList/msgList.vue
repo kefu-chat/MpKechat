@@ -133,7 +133,7 @@
 					<button class="tui-button-primary" style="margin-top:30rpx;background:#2ea44f" open-type="getUserInfo" lang="zh_CN" @getuserinfo="onGotUserInfo"  hover-class="tui-button-hover">微信登录</button>
 					<view class="tui-protocol" hover-class="opcity" :hover-stay-time="150">
 						点击"登录"即表示已同意
-						<text class="tui-protocol-red" @tap="protocol">《用户协议》</text>
+						<text class="tui-protocol-red" @tap="protocol" >《用户协议》</text>
 					</view>
 				</view>
 			</form>
@@ -353,6 +353,11 @@
 					url: '/pages/my/feedback/feedback'
 				});
 				// #endif
+			},
+			protocol(){
+				uni.navigateTo({
+					url: '/pages/common/protocol/protocol'
+				});
 			}
 		},
 		onPullDownRefresh: function() {
