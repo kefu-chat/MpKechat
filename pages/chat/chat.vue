@@ -120,10 +120,16 @@
 			};
 		},
 		onLoad: function(options) {
+			if (!Object.keys(options).indexOf('id') && location && location.hash) {
+				const id = location.hash.split('?')[1].match(/[\W]?id=([^\?^\&]+)/)[1];
+				options = {id};
+			}
+			console.log(Object.keys(options), location, location.hash)
 			this.getChatDetail(options.id);
 		},
-		onUnload: () => {
-			console.log('222222222222222');
+		beforeDestroy() {
+			const channel = `conversation.${this.conversationId}`;
+			tui.chatSocket = tui.laravelEcho.leave(channel);
 		},
 		methods: {
 			getChatDetail: function(id) {
@@ -293,6 +299,10 @@
 
 	.tui-left {
 		margin-left: 26rpx;
+	}
+
+	.tui-chat-left .tui-left {
+		margin-right: 13px;
 	}
 
 	.tui-right {

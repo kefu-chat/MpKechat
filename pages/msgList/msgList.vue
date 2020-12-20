@@ -72,12 +72,22 @@
 		<view v-if="is_online">
 			<view class="container">
 				<!--searchbox-->
-				<view class="tui-searchbox">
-					<view class="tui-search-input" @tap="search">
-						<icon type="search" size='15' color='#999'></icon>
-						<text class="tui-search-text">搜索</text>
-					</view>
-				</view>
+        <view class="tui-searchbox">
+          <view class="tui-search-input" @click="searchFocus" :class="searchFocused ? 'focused' : ''">
+            <uni-icon>
+              <i role="img" class="uni-icon-search" style="font-size: 13px; color: rgb(51, 51, 51);"></i>
+            </uni-icon>
+            <uni-input class="tui-input" :class="searchFocused ? 'focused' : ''">
+              <div class="uni-input-wrapper">
+                <input maxlength="140" step="" autocomplete="off" type="search" placeholder="搜索" class="uni-input-input" :class="searchFocused ? 'focused' : ''" :focus="searchFocused" @blur="searchBlur" @confirm="search">
+              </div>
+            </uni-input>
+            <uni-icon style="display: none;">
+              <i role="img" class="uni-icon-clear" style="font-size: 13px; color: rgb(188, 188, 188);"></i>
+            </uni-icon>
+          </view>
+          <view class="tui-cancel" v-if="searchFocused" @click="searchBlur">取消</view>
+        </view>
 				<!--searchbox-->
 			
 				<block v-for="(item,index) in msgList" :key="item.id">
@@ -135,14 +145,16 @@
 <script>
 	import tui from '@/common/httpRequest.js'
 	import subscribe from '@/common/subscribe.js'
-	var app = getApp();
 	export default {
 		data() {
 			return {
 				current: 0,
+				conversationList: [],
+				searchFocused: false,
+				keyword: '',
 				msgList: [],
 				token: null,
-				is_online: null,
+				is_online:null,
 				wxLogined: uni.getStorageSync("wxLogined") || false,
 			}
 		},
@@ -164,9 +176,9 @@
 		},
 		methods: {
 			getData: function() {
-				tui.request('api/conversation/list?type=active', 'get').then(res => {
+				tui.request('api/conversation/list?type=active' + (this.keyword ? ('&keyword=' + this.keyword) : ''), 'get',).then(res => {
 					if (res.success) {
-						this.msgList = res.data.conversations;
+						this.conversationList = res.data.conversations;
 						this.unAssignedChannel();
 						this.assignedChannel();
 					}
@@ -190,18 +202,18 @@
 			unAssignedChannel: function() {
 				tui.laravelEcho.join(`institution.${tui.institutionId()}`)
 					.listen(`.conversation.created`, (conversation) => {
-						for(const i of this.msgList){
-							if(i.id === conversation.conversation_id){
+						for (const i of this.conversationList) {
+							if (i.id === conversation.conversation_id) {
 								return;
 							}
 						}
-						this.msgList.unshift(conversation);
+						this.conversationList.unshift(conversation);
 					})
 					.listen(`.message.created`, (message) => {
-						this.msgList.filter(v => {
+						this.conversationList.filter(v => {
 							if (v.id === message.conversation_id) {
 								v.last_message = message;
-								if(message.sender_type_text === 'visitor'){
+								if (message.sender_type_text === 'visitor') {
 									v.hasNotRead = true;
 								}
 							}
@@ -211,24 +223,35 @@
 			assignedChannel: function() {
 				tui.laravelEcho.join(`institution.${tui.institutionId()}.assigned.${tui.userId()}`)
 					.listen(`.conversation.created`, (conversation) => {
-						for(const i of this.msgList){
-							if(i.id === conversation.conversation_id){
+						for (const i of this.conversationList) {
+							if (i.id === conversation.conversation_id) {
 								return;
 							}
 						}
-						this.msgList.unshift(conversation);
+						this.conversationList.unshift(conversation);
 					})
 					.listen(`.message.created`, (message) => {
-						this.msgList.filter(v => {
+						this.conversationList.filter(v => {
 							if (v.id === message.conversation_id) {
 								v.last_message = message;
-								if(message.sender_type_text === 'visitor'){
+								if (message.sender_type_text === 'visitor') {
 									v.hasNotRead = true;
 								}
 							}
 						});
 					})
 			},
+			searchFocus() {
+				this.searchFocused = true;
+			},
+			searchBlur() {
+				this.searchFocused = false;
+			},
+			search(evt) {
+				this.keyword = evt.detail.value;
+				this.getData();
+        this.searchFocused = false;
+      },
 			onGotUserInfo(res){
 				console.log(res)
 				uni.showLoading({
@@ -468,6 +491,28 @@
 		line-height: 24rpx;
 		color: #9397a4;
 	}
+
+	.badge {
+		margin-top: 60rpx;
+		margin-right: 20rpx;
+	}
+
+	.tui-cancel {
+		color: #888;
+		font-size: 14px;
+		padding-left: 15px;
+		-webkit-flex-shrink: 0;
+		flex-shrink: 0;
+	}
+	.uni-input-input {
+		width: 50px;
+	}
+	.uni-input-input.focused {
+		width: 100%;
+	}
+	.tui-input.focused, .tui-search-input.focused {
+		width: 85%;
+  }
 	.badge{
 		margin-top:60rpx;
 		margin-right: 20rpx;

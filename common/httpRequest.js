@@ -121,12 +121,14 @@ const tui = {
 				},
 				method: method, //'GET','POST'
 				dataType: 'json',
-				success: (res) => {
+				complete: () => {
 					clearTimeout(tui.delayed)
 					tui.delayed = null;
 					if (loadding && !hideLoading) {
 						uni.hideLoading()
 					}
+				},
+				success: (res) => {
 					// if (res.data && res.data.code == 1) {
 					// 	uni.clearStorageSync()
 					// 	tui.modal("登录信息已失效，请重新登录", false, () => {
@@ -140,8 +142,6 @@ const tui = {
 					resolve(res.data)
 				},
 				fail: (res) => {
-					clearTimeout(tui.delayed)
-					tui.delayed = null;
 					tui.toast("网络不给力，请稍后再试~")
 					reject(res)
 				}
