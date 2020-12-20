@@ -153,18 +153,16 @@ export default {
 						showCancel: false,
 						content: '登陆成功',
 					});
+					tui.is_online = true;
+					uni.setStorageSync("wxLogined", false);
+					uni.setStorageSync("is_online", true);
 
-					uni.reLaunch({
+					uni.redirectTo({
 						url: '/pages/msgList/msgList',
 					});
 				},
 			})
 			return;
-			setTimeout(() => {
-				uni.reLaunch({
-					url: '/pages/tabbar/my/my'
-				});
-			}, 200);
 		},
 		protocol: function() {
 			uni.navigateTo({

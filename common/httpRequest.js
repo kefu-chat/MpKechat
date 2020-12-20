@@ -8,8 +8,8 @@ var app = getApp();
 
 const tui = {
 	//接口地址
-	version: '1.0.6',
-	is_online: false,
+	is_online: null,
+	version: () => '1.0.6',
 	getIsOnline:()=> tui.is_online,
 	laravelEcho: null,
 	institutionId: function() {

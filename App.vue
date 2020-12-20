@@ -9,10 +9,17 @@
 					if (res.provider && res.provider.length) {
 						tui.login();
 					} else {
-						// H5						
-						uni.navigateTo({
-							url: '/pages/login/h5'
+						// H5
+						uni.setStorage({
+							key: 'is_online',
+							data: true
 						});
+						tui.is_online = true
+						if (!tui.getToken()) {
+							uni.navigateTo({
+								url: '/pages/login/h5'
+							});
+						}
 					}
 				},
 				fail(res) {

@@ -90,7 +90,7 @@
         </view>
 				<!--searchbox-->
 			
-				<block v-for="(item,index) in msgList" :key="item.id">
+				<block v-for="(item,index) in conversationList" :key="item.id">
 					<tui-list-cell @click="detail(item)" :unlined="true">
 						<view class="tui-chat-item">
 							<view class="tui-msg-box">
@@ -122,12 +122,12 @@
 				<view class="tui-login-from">
 					<view class="tui-line-cell">
 						<tui-icon name="mail" :size="20" color="#6d7a87"></tui-icon>
-						<input placeholder-class="tui-phcolor" class="tui-input" name="email" placeholder="请输入邮箱" maxlength="64" v-model="email" type="text" />
+						<input placeholder-class="tui-phcolor" class="tui-input" name="email" placeholder="邮箱, 测试: demo@demo.com" maxlength="64" type="text" />
 					</view>
 					<view class="tui-line-cell tui-top28">
 						<tui-icon name="pwd" :size="20" color="#6d7a87"></tui-icon>
-						<input placeholder-class="tui-phcolor" class="tui-input" name="password" placeholder="请输入密码" maxlength="32" />
-						<tui-button width="182rpx" height="56rpx" :size="24" :type="type" shape="circle" :plain="true" :disabled="disabled" @click="btnSend">{{ btnText }}</tui-button>
+						<input placeholder-class="tui-phcolor" class="tui-input" name="password" placeholder="密码, 测试: demo" maxlength="32" />
+						<tui-button width="182rpx" height="56rpx" :size="24" type="primary" shape="circle" :plain="true" @click="btnSend">{{ btnText }}</tui-button>
 					</view>
 					<button class="tui-button-primary tui-btn-submit" hover-class="tui-button-hover" form-type="submit">登录</button>
 					<button class="tui-button-primary" style="margin-top:30rpx;background:#2ea44f" open-type="getUserInfo" lang="zh_CN" @getuserinfo="onGotUserInfo"  hover-class="tui-button-hover">微信登录</button>
@@ -148,33 +148,41 @@
 	export default {
 		data() {
 			return {
+				mobile: '',
+				isLogin: false,
 				current: 0,
-				conversationList: [],
 				searchFocused: false,
 				keyword: '',
-				msgList: [],
+				conversationList: [],
 				token: null,
-				is_online:null,
+				is_online: tui.is_online,
+				btnText: '忘记密码',
 				wxLogined: uni.getStorageSync("wxLogined") || false,
 			}
 		},
 		mounted() {
-			const timeout = setInterval(() => {
-				this.is_online = uni.getStorageSync("is_online");
-				if (tui.getToken() && tui.laravelEcho) {
-					this.getData();
-					// if(this.is_online){
-					// 	uni.setNavigationBarTitle({
-					// 		title:'消息'
-					// 	})
-					// }
-					console.log('institutionId', tui.institutionId());
-					console.log('userid', tui.userId());
-					clearInterval(timeout);
-				}
-			}, 100)
+			this.init();
 		},
 		methods: {
+			init: function() {
+				let timeout = setInterval(() => {
+					this.is_online = uni.getStorageSync("is_online");
+					if (tui.getToken()) {
+						this.getData();
+						// if(this.is_online){
+						// 	uni.setNavigationBarTitle({
+						// 		title:'消息'
+						// 	})
+						// }
+						uni.setNavigationBarTitle({
+							title: '消息',
+						});
+						console.log('institutionId', tui.institutionId());
+						console.log('userid', tui.userId());
+						clearInterval(timeout);
+					}
+				}, 100)
+			},
 			getData: function() {
 				tui.request('api/conversation/list?type=active' + (this.keyword ? ('&keyword=' + this.keyword) : ''), 'get',).then(res => {
 					if (res.success) {
@@ -250,10 +258,30 @@
 			search(evt) {
 				this.keyword = evt.detail.value;
 				this.getData();
-        this.searchFocused = false;
-      },
+				this.searchFocused = false;
+			},
+			formLogin(evt) {
+				console.log(evt.detail.value)
+				if (evt.detail.value.email != 'demo@demo.com') {
+					uni.showToast({
+						title: '账号不存在!',
+						timeout: 1500,
+						icon: 'none',
+					});
+					return;
+				}
+				if (evt.detail.value.password != 'demo') {
+					uni.showToast({
+						title: '密码错误!',
+						timeout: 1500,
+						icon: 'none',
+					});
+					return;
+				}
+				uni.setStorageSync("wxLogined", true);
+				this.wxLogined = true;
+			},
 			onGotUserInfo(res){
-				console.log(res)
 				uni.showLoading({
 					title:'登陆中'
 				})
