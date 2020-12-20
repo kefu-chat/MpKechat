@@ -41,9 +41,9 @@ export default {
 		bind:function(){
 			wx.scanCode({
 				success: (res) => {
-					console.log(res.result)
+					const arr = res.result.split('kefu.chat');
 					uni.navigateTo({
-						url: res.result
+						url: arr[1]
 					});
 				  }
 			})

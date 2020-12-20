@@ -102,7 +102,7 @@
 				<view class="tui-safearea-bottom"></view>
 			</view>
 		</view>
-		<view v-if="!is_online" class="container">
+		<view v-if="is_online == false" class="container">
 			<view class="tui-bg-box">
 				<image src="/static/images/login/bg_login.png" class="tui-bg-img"></image>
 				<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-photo"></image>
@@ -135,18 +135,20 @@
 <script>
 	import tui from '@/common/httpRequest.js'
 	import subscribe from '@/common/subscribe.js'
+	var app = getApp();
 	export default {
 		data() {
 			return {
 				current: 0,
 				msgList: [],
 				token: null,
-				is_online:tui.is_online,
+				is_online: null,
 				wxLogined: uni.getStorageSync("wxLogined") || false,
 			}
 		},
 		mounted() {
 			const timeout = setInterval(() => {
+				this.is_online = uni.getStorageSync("is_online");
 				if (tui.getToken() && tui.laravelEcho) {
 					this.getData();
 					// if(this.is_online){

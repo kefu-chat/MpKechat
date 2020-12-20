@@ -4,11 +4,13 @@
  **/
 const io = require('libs/weapp.socket.io.js')
 const Echo = require("libs/echo.js")
+var app = getApp();
 
 const tui = {
 	//接口地址
 	version: '1.0.6',
 	is_online: false,
+	getIsOnline:()=> tui.is_online,
 	laravelEcho: null,
 	institutionId: function() {
 		return uni.getStorageSync("institutionId")
@@ -235,17 +237,18 @@ const tui = {
 						},
 						method: 'post',
 						success: (res) => {
-							tui.is_online = res.data.is_online;
-							if (!tui.is_online) {
+							console.log(res)
+							const data = res.data.data;
+							uni.setStorageSync('is_online',data.is_online);
+							if (!data.is_online) {
 								return;
 							}
 							if (res.data.success) {
-								if (res.data.data.token) {
-									console.log('23232323232323')
-									tui.setInstitutionId(res.data.data.institution.id);
-									tui.setUserId(res.data.data.user.id);
-									tui.setToken(res.data.data.token);
-									tui.initLaravelEcho(res.data.data.token);
+								if (data.token) {
+									tui.setInstitutionId(data.institution.id);
+									tui.setUserId(data.user.id);
+									tui.setToken(data.token);
+									tui.initLaravelEcho(data.token);
 									if (callback) callback();
 								}
 							} else if (res.data.code === 401) {
