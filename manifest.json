@@ -107,7 +107,7 @@
                 }
             }
         },
-        "domain" : "www.kefu.chat",
+        "domain" : "h5.kefu.chat",
         "router" : {
             "mode" : "hash",
             "base" : ""
