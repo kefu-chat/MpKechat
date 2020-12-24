@@ -72,22 +72,7 @@
 		<view v-if="is_online">
 			<view class="container">
 				<!--searchbox-->
-        <view class="tui-searchbox">
-          <view class="tui-search-input" @click="searchFocus" :class="searchFocused ? 'focused' : ''">
-            <uni-icon>
-              <i role="img" class="uni-icon-search" style="font-size: 13px; color: rgb(51, 51, 51);"></i>
-            </uni-icon>
-            <uni-input class="tui-input" :class="searchFocused ? 'focused' : ''">
-              <div class="uni-input-wrapper">
-                <input maxlength="140" step="" autocomplete="off" type="search" placeholder="搜索" class="uni-input-input" :class="searchFocused ? 'focused' : ''" :focus="searchFocused" @blur="searchBlur" @confirm="search">
-              </div>
-            </uni-input>
-            <uni-icon style="display: none;">
-              <i role="img" class="uni-icon-clear" style="font-size: 13px; color: rgb(188, 188, 188);"></i>
-            </uni-icon>
-          </view>
-          <view class="tui-cancel" v-if="searchFocused" @click="searchBlur">取消</view>
-        </view>
+				<zy-search theme="circle" @getSearchText="search"></zy-search>
 				<!--searchbox-->
 			
 				<block v-for="(item,index) in conversationList" :key="item.id">
@@ -262,8 +247,8 @@
 			searchBlur() {
 				this.searchFocused = false;
 			},
-			search(evt) {
-				this.keyword = evt.detail.value;
+			search(keyword) {
+				this.keyword = keyword;
 				this.getData();
 				this.searchFocused = false;
 			},

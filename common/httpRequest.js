@@ -4,7 +4,6 @@
  **/
 const io = require('libs/weapp.socket.io.js')
 const Echo = require("libs/echo.js")
-var app = getApp();
 
 const tui = {
 	//接口地址

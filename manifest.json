@@ -1,9 +1,9 @@
 {
     "name" : "客服恰",
     "appid" : "",
-    "description" : "ThorUI跨端项目，uni-app版本，v3编译，支持nvue uni-app编译模式（原weex编译模式），easycom组件模式（无需手动引入，开发工具自带智能感知）",
-    "versionName" : "1.5.8",
-    "versionCode" : 120,
+    "description" : "简洁高效的客服支持工具",
+    "versionName" : "1.0.7",
+    "versionCode" : 1,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -18,10 +18,7 @@
         },
         /* 模块配置 */
         "modules" : {
-            "Share" : {},
-            "Maps" : {},
-            "VideoPlayer" : {},
-            "Webview-x5" : {}
+            "Push" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -63,7 +60,20 @@
                         "appkey_ios" : "",
                         "appkey_android" : ""
                     }
+                },
+                "share" : {
+                    "weixin" : {
+                        "appid" : "",
+                        "UniversalLinks" : ""
+                    }
+                },
+                "push" : {
+                    "unipush" : {}
                 }
+            },
+            "splashscreen" : {
+                "androidStyle" : "common",
+                "iosStyle" : "common"
             }
         },
         "nvueLaunchMode" : "fast"
@@ -112,5 +122,10 @@
             "mode" : "hash",
             "base" : ""
         }
+    },
+    "quickapp-webview" : {
+        "package" : "chat.kefu",
+        "versionName" : "1.0.7",
+        "versionCode" : 1
     }
 }
