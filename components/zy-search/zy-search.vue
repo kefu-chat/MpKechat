@@ -5,10 +5,10 @@
 				<image src="../../static/zy-search/voice.svg" mode="aspectFit" @click="startRecognize()" class="voice-icon"></image>
 			<!-- #endif -->
 			<template v-if="isFocus">
-				<input maxlength="20" focus type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListShow = false" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
+				<input maxlength="20" focus type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListBlur" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
 			</template>
 			<template v-else>
-				<input maxlength="20" type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListShow = false" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
+				<input maxlength="20" type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListBlur" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
 			</template>
 			<image src="../../static/zy-search/search.svg" mode="aspectFit" @click="searchStart()" class="search-icon"></image>
 		</view>
@@ -65,16 +65,13 @@
 			};
 		},
 		methods: {
+			hListBlur: function () {
+				setTimeout(() => this.hListShow = false, 100);
+			},
 			searchStart: function() {	//触发搜索
 				let _this = this;
-				if (_this.searchText == '') {
-					uni.showToast({
-						title: '请输入关键字',
-						icon: 'none',
-						duration: 1000
-					});
-				}else{
-					_this.$emit('getSearchText', _this.searchText);
+				_this.$emit('getSearchText', _this.searchText);
+				if (_this.searchText != '') {
 					uni.getStorage({
 						key:'search_cache',
 						success(res){

@@ -74,7 +74,9 @@
 				<!--searchbox-->
 				<zy-search theme="circle" @getSearchText="search"></zy-search>
 				<!--searchbox-->
-			
+				<block v-if="conversationList && conversationList.length === 0">
+					<tui-no-data :fixed="false" imgUrl="/static/images/toast/img_noorder_3x.png">没有可展示的咨询</tui-no-data>
+				</block>
 				<block v-for="(item,index) in conversationList" :key="item.id">
 					<tui-list-cell @click="detail(item)" :unlined="true">
 						<view class="tui-chat-item">
@@ -138,7 +140,7 @@
 				current: 0,
 				searchFocused: false,
 				keyword: '',
-				conversationList: [],
+				conversationList: null,
 				token: null,
 				is_online: tui.is_online,
 				btnText: '忘记密码',
