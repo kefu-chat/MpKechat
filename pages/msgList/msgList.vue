@@ -68,11 +68,13 @@
 			</view>
 		</view>
 	</view>
-	<view v-else-if="wxLogined === false">
+	<view v-else-if="wxLogined === false"  style="position:relative;">
 		<view v-if="is_online">
-			<view class="container">
-				<!--searchbox-->
-				<zy-search theme="circle" @getSearchText="search"></zy-search>
+			<!--searchbox-->
+			<view style="position: fixed;top:0;width:100%;z-index: 100;">
+				<zy-search theme="circle" :list="conversationList" v-if="showSearch" style="height:40px;width:100%"></zy-search>
+			</view>
+			<view class="container" style="padding-top:50px">
 				<!--searchbox-->
 				<block v-if="conversationList && conversationList.length === 0">
 					<tui-no-data :fixed="false" imgUrl="/static/images/toast/img_noorder_3x.png">没有可展示的咨询</tui-no-data>
@@ -145,10 +147,18 @@
 				is_online: tui.is_online,
 				btnText: '忘记密码',
 				wxLogined: uni.getStorageSync("wxLogined") || false,
+				showSearch: false
 			}
 		},
 		mounted() {
 			this.init();
+		},
+		onShow() {
+			this.showSearch = false;
+			setTimeout(()=>{
+				this.showSearch = true;
+			})
+			this.$forceUpdate();
 		},
 		methods: {
 			init: function() {
@@ -184,11 +194,6 @@
 					if (res.success) {
 						this.conversationList = res.data.conversations;
 					}
-				})
-			},
-			search: function() {
-				uni.navigateTo({
-					url: '../../news/search/search'
 				})
 			},
 			detail: function(item) {
@@ -423,7 +428,6 @@
 		height: 100rpx;
 		padding: 0 30rpx;
 		box-sizing: border-box;
-		background: #fff;
 		display: flex;
 		align-items: center;
 		justify-content: center;

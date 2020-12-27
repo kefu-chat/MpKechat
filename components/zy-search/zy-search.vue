@@ -1,281 +1,274 @@
 <template name="zy-search">
-	<view>
-		<view class="search">
-			<!-- #ifdef APP-PLUS -->
-				<image src="../../static/zy-search/voice.svg" mode="aspectFit" @click="startRecognize()" class="voice-icon"></image>
-			<!-- #endif -->
-			<template v-if="isFocus">
-				<input maxlength="20" focus type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListBlur" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
-			</template>
-			<template v-else>
-				<input maxlength="20" type="text" value="" confirm-type="search" @focus="hListShow = true" @blur="hListBlur" @confirm="searchStart()" placeholder="请输入关键词搜索" v-model.trim="searchText"/>
-			</template>
-			<image src="../../static/zy-search/search.svg" mode="aspectFit" @click="searchStart()" class="search-icon"></image>
-		</view>
-		<view :class="'s-' + theme" v-if="hList.length > 0 && hListShow">
-			<view class="header">
-				历史记录
-				<image src="../../static/zy-search/delete.svg" mode="aspectFit" @click="delhistory"></image>
+	<view class="container">
+		<view class="tui-searchbox" style="padding:0 20rpx">
+			<view class="tui-search-input">
+				<icon type="search" :size='13' color='#333'></icon>
+				<input confirm-type="search" placeholder="请输入关键词搜索" @confirm="search(key)" @focus="doFucus"
+				 placeholder-class="tui-input-plholder" class="tui-input" v-model.trim="key" @input="inputKey" />
+				<icon type="clear" :size='13' color='#bcbcbc' @tap="cleanKey" v-show="key"></icon>
 			</view>
-			<view class="list">
-				<view v-for="(item,index) in hList" :key="index" @click="keywordsClick(item)">{{item}}</view>
+			<view class="tui-cancle" @tap="cannel" v-if="isFocus">取消</view>
+		</view>
+
+		<view v-if="isFocus" class="mainContainer"  :style="{height:h}">
+			<view class="tui-search-history" v-show="history.length>0 && !key">
+				<view class="tui-history-header">
+					<view class="tui-search-title">搜索历史</view>
+					<tui-icon name="delete" :size='14' color='#333' @tap="clearHistory" class="tui-icon-delete"></tui-icon>
+				</view>
+				<view class="tui-history-content">
+					<block v-for="(item,index) in history" :key="index">
+						<tui-tag margin="0 24rpx 24rpx 0" type="gray" shape="circle" @click="keywordsClick(item)">{{item}}</tui-tag>
+					</block>
+				</view>
+			</view>
+			<view v-show="key" style="height:100%">
+				<view class="tui-header">
+					<view class="tui-header-left tui-noboredr">搜索 “{{key}}”</view>
+				</view>
+				<view class="tui-result-box">
+					<view>联系人</view>
+					<block v-for="(item,index) in searchResult" :key="index" style="clear: both;">
+						<view class="tui-result-item" hover-class="tui-opcity" :hover-stay-time="150" @click="detail(item)"  style="clear: both;margin:5px 0;">
+							<image :src="item.visitor.avatar?item.visitor.avatar:'http://localhost:4200/assets/tmp/img/random/' + (Number(index%50 )+1) +'.svg'"
+							 class="visitorPic"></image>
+							 <View class="visitorName">{{item.visitor.name}}</View>
+						</view>
+					</block>
+				</view>
 			</view>
 		</view>
-		<view :class="'wanted-' + theme" v-if="showWant">
-			<view class="header">猜你想搜的</view>
-			<view class="list">
-				<view v-for="(item,index) in hotList" :key="index" @click="keywordsClick(item)">{{item}}</view>
+
+
+		<!-- <view class="tui-search-hot">
+			<view class="tui-hot-header">
+				<view class="tui-search-title">大家正在搜</view>
 			</view>
-		</view>
+			<view class="tui-hot-content">
+				<block v-for="(item,index) in hot" :key="index">
+					<tui-tag type="gray" shape="circle">{{item}}</tui-tag>
+				</block>
+			</view>
+		</view> -->
 	</view>
+
 </template>
 
 <script>
-	export default{
-		name:"zy-search",
-		props:{
-			isFocus:{	//是否自动获取焦点
-				type: Boolean,
-				default: false
-			},
-			theme:{	//选择块级显示还是圆形显示
-				type: String,
-				default: 'block'
-			},
-			showWant:{	//是否展示推荐菜单
-				type: Boolean,
-				default: false
-			},
-			hotList: { //推荐列表数据
+	const util = require("@/utils/util.js")
+	export default {
+		props: {
+			list: {
 				type: Array,
-				default () {
-					return []
-				}
+				default: function() {
+					return {};
+				},
 			},
-			speechEngine: { //语音引擎=>讯飞:iFly,百度:'baidu'
-				type: String,
-				default: 'baidu'
-			}
 		},
 		data() {
 			return {
-				searchText:'',								//搜索关键词
-				hList:uni.getStorageSync('search_cache'), 	//历史记录
-				hListShow: false,
-			};
+				history: uni.getStorageSync('search_cache'),
+				key: "",
+				showActionSheet: false,
+				tips: "确认清空搜索历史吗？",
+				searchResult: [],
+				searchList: [],
+				isFocus: false,
+				h:'200px',
+			}
 		},
 		methods: {
-			hListBlur: function () {
-				setTimeout(() => this.hListShow = false, 100);
+			doFucus: function(){
+				this.isFocus = true;
+				this.h = uni.getSystemInfoSync().windowHeight-uni.upx2px(50) + 'px';
+				// this.$refs.main.height = 400;
 			},
-			searchStart: function() {	//触发搜索
-				let _this = this;
-				_this.$emit('getSearchText', _this.searchText);
-				if (_this.searchText != '') {
-					uni.getStorage({
-						key:'search_cache',
-						success(res){
-							let list = res.data;
-							if(list.length > 5){
-								for(let item of list){
-									if(item == _this.searchText){
-										return;
-									}
-								}
-								list.pop();
-								list.unshift(_this.searchText);
-							}else{
-								for(let item of list){
-									if(item == _this.searchText){
-										return;
-									}
-								}
-								list.unshift(_this.searchText);
-							}
-							_this.hList = list;
-							uni.setStorage({
-								key: 'search_cache',
-								data: _this.hList
-							});
-						},
-						fail() {
-							_this.hList = [];
-							_this.hList.push(_this.searchText);
-							uni.setStorage({
-								key: 'search_cache',
-								data: _this.hList
-							});
-							_this.$emit('getSearchText', _this.searchText);
-						}
-					})
+			cannel: function() {
+				this.key = '';
+				this.isFocus = false;
+			},
+			cleanKey: function() {
+				this.key = '';
+			},
+			closeActionSheet: function() {
+				this.showActionSheet = false
+			},
+			openActionSheet: function() {
+				this.showActionSheet = true
+			},
+			itemClick: function(e) {
+				let index = e.index;
+				if (index == 0) {
+					this.showActionSheet = false;
+					this.history = []
 				}
 			},
-			keywordsClick (item) {	//关键词搜索与历史搜索
-				this.searchText = item;
-				this.searchStart();
+			inputKey: function(e) {
+				this.key = util.trim(e.detail.value);
 			},
-			delhistory () {		//清空历史记录
-				this.hList = [];
+			keywordsClick(item) { //关键词搜索与历史搜索
+				this.key = item;
+				this.searchResult = this.list.filter(v => v.visitor.name.indexOf(item) >= 0);
+			},
+			clearHistory() {
+				this.history = [];
 				uni.setStorage({
 					key: 'search_cache',
 					data: []
 				});
 			},
-			startRecognize: function() {	//语音输入
-				let _this = this;
-				let options = {};
-				options.engine = _this.speechEngine;
-				options.punctuation = false; // 是否需要标点符号 
-				options.timeout = 10 * 1000;
-				plus.speech.startRecognize(options, function(s) {
-					_this.searchText = _this.searchText + s;
+			search() {
+				let history = uni.getStorageSync('search_cache');
+				if(!history){
+					history = [];
+				}
+				if (history.length > 15) {
+					history.splice(0, 1);
+				}
+				const index = history.indexOf(this.key);
+				if (index >= 0) {
+					history.splice(index, 1);
+				}
+				history.unshift(this.key);
+				uni.setStorage({
+					key: 'search_cache',
+					data: history
 				});
-			}
+				this.history = history;
+				this.searchResult = this.list.filter(v => v.visitor.name.indexOf(this.key) >= 0);
+				console.log(this.searchResult)
+			},
+			detail: function(item) {
+					uni.navigateTo({
+						url: '/pages/chat/chat?id=' + item.id,
+					})
+			},
 		}
 	}
 </script>
 
-<style lang="less" scoped>
-	.search{
-		/*width: 640upx;*/
-		margin: 30upx auto 30upx;
-		position: relative;
-		input{
-			background-color: #F7F7F7;
-			padding: 10upx 74upx;
-			font-size: 28upx;
-			border-radius: 50upx;
-		}
-		.voice-icon{
-			width: 36upx;
-			height: 36upx;
-			padding: 16upx 20upx 16upx 0;
-			position: absolute;
-			left: 16upx;
-			top: 4upx;
-			z-index: 10;
-		}
-		.search-icon{
-			width: 36upx;
-			height: 36upx;
-			padding: 16upx 20upx 16upx 0;
-			position: absolute;
-			right: 0;
-			top: -2upx;
-			z-index: 10;
-		}
+<style>
+	page {
+		color: #333;
+		background: #fff;
+		height: 100%;
 	}
-	.s-block{
-		margin-top: 30upx;
-		.header{
-			font-size: 32upx;
-			padding: 30upx;
-			position: relative;
-			image{
-				width: 36upx;
-				height: 36upx;
-				padding: 10upx;
-				position: absolute;
-				right: 40upx;
-				top: 24upx;
-			}
-		}
-		.list{
-			display: flex;
-			flex-wrap: wrap;
-			view{
-				width: 50%;
-				color: #8A8A8A;
-				font-size: 28upx;
-				box-sizing: border-box;
-				text-align: center;
-				padding: 20upx 0;
-				border-top: 2upx solid #FFF;
-    			border-left: 2upx solid #FFF;
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
-				background-color: #F7F7F7;
-			}
-		}
+
+	.container {
+		box-sizing: border-box;
+		background: #f8f8f8;
+		height: 100%;
 	}
-	.s-circle{
-		margin-top: 30upx;
-		.header{
-			font-size: 32upx;
-			padding: 30upx;
-			border-bottom: 2upx solid #F9F9F9;
-			position: relative;
-			image{
-				width: 36upx;
-				height: 36upx;
-				padding: 10upx;
-				position: absolute;
-				right: 40upx;
-				top: 24upx;
-			}
-		}
-		.list{
-			display: flex;
-			flex-wrap: wrap;
-			padding: 0 30upx 20upx;
-			view{
-				padding: 8upx 30upx;
-				margin: 20upx 30upx 0 0;
-				font-size: 28upx;
-				color: #8A8A8A;
-				background-color: #F7F7F7;
-				box-sizing: border-box;
-				text-align: center;
-				border-radius: 20upx;
-			}
-		}
+
+	.tui-searchbox {
+		padding: 30rpx 0;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
 	}
-	.wanted-block{
-		margin-top: 30upx;
-		.header{
-			font-size: 32upx;
-			padding: 30upx;
-		}
-		.list{
-			display: flex;
-			flex-wrap: wrap;
-			view{
-				width: 50%;
-				color: #8A8A8A;
-				font-size: 28upx;
-				box-sizing: border-box;
-				text-align: center;
-				padding: 20upx 0;
-				border-top: 2upx solid #FFF;
-				border-left: 2upx solid #FFF;
-				background-color: #F7F7F7;
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
-			}
-		}
+
+	.tui-search-input {
+		width: 100%;
+		height: 66rpx;
+		border-radius: 35rpx;
+		padding: 0 30rpx;
+		box-sizing: border-box;
+		background: #fff;
+		display: flex;
+		align-items: center;
+		flex-wrap: nowrap;
 	}
-	.wanted-circle{
-		margin-top: 30upx;
-		.header{
-			font-size: 32upx;
-			padding: 30upx;
-		}
-		.list{
-			display: flex;
-			flex-wrap: wrap;
-			padding: 0 30upx 20upx;
-			view{
-				padding: 8upx 30upx;
-				margin: 20upx 30upx 0 0;
-				font-size: 28upx;
-				color: #8A8A8A;
-				background-color: #F7F7F7;
-				box-sizing: border-box;
-				text-align: center;
-				border-radius: 20upx;
-			}
-		}
+
+	.tui-input {
+		flex: 1;
+		color: #333;
+		padding: 0 16rpx;
+		font-size: 28rpx;
 	}
+
+	.tui-input-plholder {
+		font-size: 28rpx;
+		color: #b2b2b2;
+	}
+
+	.tui-cancle {
+		color: #888;
+		font-size: 28rpx;
+		padding-left: 30rpx;
+		flex-shrink: 0;
+	}
+
+	.tui-history-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 30rpx 0;
+	}
+
+	.tui-history-content {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.tui-icon-delete {
+		padding: 10rpx;
+	}
+
+	.tui-search-title {
+		font-size: 28rpx;
+		font-weight: bold;
+	}
+
+	.tui-hot-header {
+		padding: 30rpx 0;
+	}
+
+	.tui-header {
+		padding: 26rpx 0;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.tui-header-left {
+		font-size: 30rpx;
+		color: #222;
+		border-left: 4rpx solid #EB0909;
+		padding-left: 10rpx;
+		word-break: break-all;
+	}
+
+	.tui-noboredr {
+		border-left: 0 !important;
+	}
+
+	.tui-result-box {
+		height:calc(100% - 20px);
+		display:flex;
+		font-size: 28rpx;
+		flex-direction: column;
+		overflow: auto;
+	}
+
+	.tui-result-item {
+		padding: 14rpx 0;
+	}
+	.visitorPic{
+		float: left;
+		display: inline-block;
+		width: 42px;
+		height: 42px;
+	}
+	.visitorName{
+		float: left;
+		line-height: 42px;
+		height: 42px;
+		padding-left:15px;
+	}
+	.mainContainer{
+		background: #fff;padding: 0 30rpx 20rpx;
+	}
+
 </style>
