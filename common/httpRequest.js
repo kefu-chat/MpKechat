@@ -8,7 +8,7 @@ const Echo = require("libs/echo.js")
 const tui = {
 	//接口地址
 	is_online: null,
-	version: '1.0.7',
+	version: require('@/manifest.json').versionName,
 	getIsOnline:()=> tui.is_online,
 	laravelEcho: null,
 	institutionId: function() {
