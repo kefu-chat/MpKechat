@@ -1,18 +1,7 @@
 <template>
 	<view class="container">
-		<!--tabbar-->
-
-		<!--tabbar-->
 		<view class="tui-chat-content">
 			<tui-loadmore v-if="loadding" :index="3" type="primary" text=" "></tui-loadmore>
-			<!-- <view v-show="show">
-				<view class="tui-label">对方已通过您的好友请求</view>
-				<view class="tui-chat-center">星期四 11:02</view>
-				<view class="tui-chat-right">
-					<view class="tui-chatbox tui-chatbox-right">哈喽~，欢迎关注Thor UI！</view>
-					<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-				</view>
-			</view> -->
 			<view v-for="(value, key) in messageList" :key=key>
 				<view class="tui-chat-center">
 					<uni-dateformat :date="value[0].created_at" format="yyyy-MM-dd hh:mm"></uni-dateformat>
@@ -28,76 +17,9 @@
 						 class="tui-user-pic tui-left" v-if="item.sender_type_text !='visitor'"></image>
 					</view>
 				</view>
-
 			</view>
-
-			<!-- <view class="tui-chat-center">星期四 11:02</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-chatbox tui-chatbox-left">哈喽~，欢迎关注Thor UI！</view>
-			</view>
-			<view class="tui-chat-center">星期五 12:09</view>
-			<view class="tui-chat-right">
-				<view class="tui-chatbox tui-chatbox-right">哈喽~，欢迎关注Thor UI！ 请说出您想加入或者优化的功能！</view>
-				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-			</view>
-			<view class="tui-chat-right">
-				<view class="tui-chatbox tui-chatbox-right">哈喽~，欢迎关注Thor UI！</view>
-				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-			</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-chatbox tui-chatbox-left">哈喽~，欢迎关注Thor UI！</view>
-			</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-img-chatbox"><image src="/static/images/news/avatar_2.jpg" class="tui-chat-img" mode="widthFix"></image></view>
-			</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-img-chatbox"><image src="/static/images/news/banner_2.jpg" class="tui-chat-img" mode="widthFix"></image></view>
-			</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-flex-center">
-					<view class="tui-chatbox tui-chatbox-left tui-chat-flex tui-mr">
-						<image src="/static/images/chat/voice.png" class="tui-chat-voice tui-mr"></image>
-						<view>8"</view>
-					</view>
-					<tui-badge :dot="true" type="danger"></tui-badge>
-				</view>
-			</view>
-			<view class="tui-chat-left">
-				<image src="/static/images/news/avatar_1.jpg" class="tui-user-pic tui-right"></image>
-				<view class="tui-flex-center">
-					<view class="tui-chatbox tui-chatbox-left tui-chat-flex tui-mr">
-						<image src="/static/images/chat/voice.png" class="tui-chat-voice tui-mr"></image>
-						<view style="width:300rpx">20"</view>
-					</view>
-					<tui-badge :dot="true" type="danger"></tui-badge>
-				</view>
-			</view>
-
-			<view class="tui-chat-right">
-				<view class="tui-flex-center tui-flex-end">
-					<tui-badge :dot="true" type="danger"></tui-badge>
-					<view class="tui-chatbox tui-chatbox-right tui-chat-flex tui-ml tui-flex-reverse">
-						<image src="/static/images/chat/voice.png" class="tui-chat-voice tui-rotate tui-ml"></image>
-						<view style="width:280rpx;text-align:right">18"</view>
-					</view>
-				</view>
-				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-			</view>
-
-			<view class="tui-chat-right">
-				<view class="tui-flex-center tui-flex-end tui-flex-reverse">
-					<view class="tui-img-chatbox"><image src="/static/images/news/avatar_1.jpg" class="tui-chat-img" mode="widthFix"></image></view>
-					<image src="/static/images/chat/fail.png" class="tui-chat-fail tui-mr"></image>
-				</view>
-				<image src="/static/images/news/avatar_2.jpg" class="tui-user-pic tui-left"></image>
-			</view> -->
 		</view>
-		<t-chat-bar :conversation-id='conversationId' @messageCreated="messageSent"></t-chat-bar>
+		<t-chat-bar :conversation-id='conversationId' @messageCreated="messageSent" v-if="showTchatbar"></t-chat-bar>
 	</view>
 </template>
 
@@ -117,14 +39,22 @@
 				has_previous: false,
 				messageList: {},
 				conversationId: null,
+				showTchatbar: false,
 			};
 		},
 		onLoad: function(options) {
-			if (!Object.keys(options).indexOf('id') && location && location.hash) {
-				const id = location.hash.split('?')[1].match(/[\W]?id=([^\?^\&]+)/)[1];
-				options = {id};
-			}
-			this.getChatDetail(options.id);
+			const socketLoop = setInterval(() => {
+				if (tui.laravelEcho) {
+					if (!Object.keys(options).indexOf('id') && location && location.hash) {
+						const id = location.hash.split('?')[1].match(/[\W]?id=([^\?^\&]+)/)[1];
+						options = {
+							id
+						};
+					}
+					this.getChatDetail(options.id);
+					clearInterval(socketLoop);
+				}
+			}, 100)
 		},
 		beforeDestroy() {
 			const channel = `conversation.${this.conversationId}`;
@@ -164,25 +94,26 @@
 			scrollBottomFn: function() {
 				wx.createSelectorQuery().select('.tui-chat-content').boundingClientRect(function(rect) {
 					wx.pageScrollTo({
-						scrollTop: rect.bottom,
+						scrollTop: rect.height,
 						duration: 0
 					})
 				}).exec()
 			},
-			messageSent(message) {			
+			messageSent(message) {
 				const day = utils.formatDate(message.created_at);
 				if (!this.messageList[day]) {
 					this.messageList[day] = [];
 				}
-				this.messageList[day].push(message)
-				console.log(message)
+				this.messageList[day].push(message);
+				setTimeout(() => {
+					this.scrollBottomFn();
+				}, 200);
+				
 				if (this.$forceUpdate) {
 					this.$forceUpdate();
 				}
 
-				setTimeout(() => {
-				  this.scrollBottomFn();
-				}, 200);
+
 			},
 			previewImage(src) {
 				uni.previewImage({
@@ -190,26 +121,28 @@
 					urls: Object.values(this.messageList).flat().filter(msg => msg.type == 2).map(msg => msg.content),
 				});
 			},
-			initSocket(){
+			initSocket() {
 				const channel = `conversation.${this.conversationId}`;
-				tui.chatSocket = tui.laravelEcho.join(channel);
+					tui.chatSocket = tui.laravelEcho.join(channel);
 
-				tui.chatSocket.here(console.log)
-				  .joining(console.log)
-				  .leaving((user) => {
-					// if (user.id !== this.visitor.id) {
-					//   return;
-					// }
-			
-					// this.conversation.online_status = false;
-				  })
-				  // .listen(".message.created", (e) => {
-				  //   this.messageList.push(e);
-				  //   setTimeout(() => {
-				  //     this.scrollTo();
-				  //   }, 200);
-				  // })
-				  .listenForWhisper("message", (message) => this.messageSent(message))
+					tui.chatSocket.here(console.log)
+						.joining(console.log)
+						.leaving((user) => {
+							// if (user.id !== this.visitor.id) {
+							//   return;
+							// }
+
+							// this.conversation.online_status = false;
+						})
+						// .listen(".message.created", (e) => {
+						//   this.messageList.push(e);
+						//   setTimeout(() => {
+						//     this.scrollTo();
+						//   }, 200);
+						// })
+						.listenForWhisper("message", (message) => this.messageSent(message))
+					this.showTchatbar = true;
+
 			}
 		},
 		onPageScroll(e) {
